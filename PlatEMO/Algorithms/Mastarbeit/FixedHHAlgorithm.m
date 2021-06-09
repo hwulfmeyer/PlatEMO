@@ -12,32 +12,39 @@ classdef FixedHHAlgorithm < ALGORITHM
             %% Generate random population
             Population = Problem.Initialization();
             
-            algos = {@NSGAII, @MOEAD, @NSGAII, @MOEAD , @NSGAII, @MOEAD, @NSGAII, @MOEAD, @NSGAII, @MOEAD , @NSGAII, @MOEAD};
-            args = {Algorithm, Population, Problem};
-            maxFEperAlgo = Algorithm.pro.maxFE/length(algos);
+            algos = {@NSGAII, @MOEAD};
+            repitions = 6;
+            algopops = {Population, Population};
+            args = {Algorithm, algopops, Problem};
+            maxFEperAlgo = Algorithm.pro.maxFE/(length(algos)*repitions);
             while Algorithm.NotTerminated(Population)
-                for i = 1 : length(algos)
-                    Population = algos{i}(args{:}, maxFEperAlgo*i);
-                    args = {Algorithm, Population, Problem};
+                for k = 1 : repitions
+                    for i = 1 : length(algos)
+                        Population = algos{i}(args{:}, maxFEperAlgo*((k-1)*length(algos)+i), i);
+                        args = {Algorithm, Population, Problem};
+                    end
                 end
             end
         end
         
-        function Population = NSGAII(Algorithm, Population, Problem, maxFE)
+        function Algopops = NSGAII(Algorithm, Algopops, Problem, maxFE, i)
             disp('NSGAII')
             disp(maxFE)
-            %% Generate random population
-            [~,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
-            
+            Population = Algopops{i};
+            [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
             %% Optimization
-            while Algorithm.pro.FE < maxFE && Algorithm.NotTerminated(Population)
+            while Algorithm.NotTerminated(Population) && Algorithm.pro.FE < maxFE
                 MatingPool = TournamentSelection(2,Problem.N,FrontNo,-CrowdDis);
                 Offspring  = OperatorGA(Population(MatingPool));
                 [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
+                %%update all Populations
+                for k = 1 : length(Algopops)
+                    Algopops{k} = Population;
+                end
             end
         end
         
-        function Population = MOEAD(Algorithm, Population, Problem, maxFE)
+        function Algopops = MOEAD(Algorithm, Algopops, Problem, maxFE, i)
             disp('MOEAD')
             disp(maxFE)
             %% Parameter setting
@@ -51,13 +58,14 @@ classdef FixedHHAlgorithm < ALGORITHM
             B = pdist2(W,W);
             [~,B] = sort(B,2);
             B = B(:,1:T);
-
-            %% Generate random population
+            
+            Population = Algopops{i};
             Z = min(Population.objs,[],1);
 
             %% Optimization
-            while Algorithm.pro.FE < maxFE && Algorithm.NotTerminated(Population)
+            while Algorithm.NotTerminated(Population) && Algorithm.pro.FE < maxFE
                 % For each solution
+                PopulationOld = Population;
                 for i = 1 : Problem.N
                     % Choose the parents
                     P = B(i,randperm(size(B,2)));
@@ -94,6 +102,15 @@ classdef FixedHHAlgorithm < ALGORITHM
                             g_new = max(repmat(abs(Offspring.obj-Z),T,1)./W(P,:),[],2);
                     end
                     Population(P(g_old>=g_new)) = Offspring;
+                end
+                %%update all Populations
+                [PopulationNSGAII,~,~] = NSGAIIEnvironmentalSelection([PopulationOld,Population],Problem.N);
+                for k = 1 : length(Algopops)
+                    if i == k
+                        Algopops{i} = Population
+                        continue
+                    end
+                    Algopops{k} = PopulationNSGAII;
                 end
             end
         end
