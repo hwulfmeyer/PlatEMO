@@ -1,4 +1,4 @@
-classdef OnHHAlgorithm < ALGORITHM
+classdef FixedHHAlgorithm < ALGORITHM
 % <multi> <real/binary/permutation>
 % Copyright (C) 2021 Hans-Martin Wulfmeyer
 
