@@ -1,5 +1,5 @@
 classdef OnHHAlgorithm < ALGORITHM
-% <single> <real>
+% <multi> <real/binary/permutation>
 % Copyright (C) 2021 Hans-Martin Wulfmeyer
 
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
@@ -11,16 +11,19 @@ classdef OnHHAlgorithm < ALGORITHM
         function main(Algorithm,Problem)
             %% Generate random population
             Population = Problem.Initialization();
+            algos = {@NSGAII, @MOEAD, @NSGAII, @MOEAD, @NSGAII};
+            args = {Algorithm, Population, Problem};
+            maxFEperAlgo = Algorithm.pro.maxFE/length(algos);
             while Algorithm.NotTerminated(Population)
-                maxFE = Algorithm.pro.maxFE/3;
-                Population = NSGAII(Algorithm, Population, Problem, maxFE);
-                Population = MOEAD(Algorithm, Population, Problem, maxFE*2);
-                Population = NSGAII(Algorithm, Population, Problem, maxFE*3);
+                for i = 1 : length(algos)
+                    Population = algos{i}(args{:}, maxFEperAlgo*i);
+                end
             end
         end
         
         function Population = NSGAII(Algorithm, Population, Problem, maxFE)
             disp('NSGAII')
+            disp(maxFE)
             %% Generate random population
             [~,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
             
@@ -34,6 +37,7 @@ classdef OnHHAlgorithm < ALGORITHM
         
         function Population = MOEAD(Algorithm, Population, Problem, maxFE)
             disp('MOEAD')
+            disp(maxFE)
             %% Parameter setting
             type = 1;
 
