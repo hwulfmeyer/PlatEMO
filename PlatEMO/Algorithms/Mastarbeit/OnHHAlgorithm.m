@@ -11,12 +11,14 @@ classdef OnHHAlgorithm < ALGORITHM
         function main(Algorithm,Problem)
             %% Generate random population
             Population = Problem.Initialization();
-            algos = {@NSGAII, @MOEAD, @NSGAII, @MOEAD, @NSGAII};
+            
+            algos = {@NSGAII, @MOEAD, @NSGAII, @MOEAD , @NSGAII, @MOEAD, @NSGAII, @MOEAD, @NSGAII, @MOEAD , @NSGAII, @MOEAD};
             args = {Algorithm, Population, Problem};
             maxFEperAlgo = Algorithm.pro.maxFE/length(algos);
             while Algorithm.NotTerminated(Population)
                 for i = 1 : length(algos)
                     Population = algos{i}(args{:}, maxFEperAlgo*i);
+                    args = {Algorithm, Population, Problem};
                 end
             end
         end
@@ -28,7 +30,7 @@ classdef OnHHAlgorithm < ALGORITHM
             [~,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
             
             %% Optimization
-            while Algorithm.pro.FE < maxFE
+            while Algorithm.pro.FE < maxFE && Algorithm.NotTerminated(Population)
                 MatingPool = TournamentSelection(2,Problem.N,FrontNo,-CrowdDis);
                 Offspring  = OperatorGA(Population(MatingPool));
                 [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
@@ -54,7 +56,7 @@ classdef OnHHAlgorithm < ALGORITHM
             Z = min(Population.objs,[],1);
 
             %% Optimization
-            while Algorithm.pro.FE < maxFE
+            while Algorithm.pro.FE < maxFE && Algorithm.NotTerminated(Population)
                 % For each solution
                 for i = 1 : Problem.N
                     % Choose the parents
