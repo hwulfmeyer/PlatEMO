@@ -12,39 +12,74 @@ classdef FixedHHAlgorithm < ALGORITHM
             %% Generate random population
             Population = Problem.Initialization();
             
-            algos = {@NSGAII, @MOEAD};
-            repitions = 6;
-            algopops = {Population, Population};
-            args = {Algorithm, algopops, Problem};
-            maxFEperAlgo = Algorithm.pro.maxFE/(length(algos)*repitions);
+            %%available MOEAs
+            moeas = {@NSGAII, @MOEAD, @NSGAIII};
+            %moeas_pops = NaN(1,length(moeas));
+            moeas_pops = cell(1,length(moeas));
+            for k = 1 : length(moeas_pops)
+                moeas_pops{k} = Population;
+            end
+            
+            %%encoding defines which algorithm to apply based on index of the MOEA in 'moeas'
+
+            encoding = {1,2,3,1,2,3,2,1,3,2};
+            
+            args = {Algorithm, moeas_pops, Problem};
+            maxFEperAlgo = Algorithm.pro.maxFE/(length(encoding));
+            
             while Algorithm.NotTerminated(Population)
-                for k = 1 : repitions
-                    for i = 1 : length(algos)
-                        Population = algos{i}(args{:}, maxFEperAlgo*((k-1)*length(algos)+i), i);
-                        args = {Algorithm, Population, Problem};
-                    end
+                for i = 1 : length(encoding)
+                    moea_index = encoding{i};
+                    Moeas_pops = moeas{moea_index}(args{:}, maxFEperAlgo*i, moea_index);
+                    args = {Algorithm, Moeas_pops, Problem};
                 end
             end
         end
         
-        function Algopops = NSGAII(Algorithm, Algopops, Problem, maxFE, i)
+        function Moeas_pops = NSGAII(Algorithm, Moeas_pops, Problem, maxFE, i)
             disp('NSGAII')
             disp(maxFE)
-            Population = Algopops{i};
-            [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
+            Population = Moeas_pops{i};
+            [Population, FrontNo, CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
+
             %% Optimization
             while Algorithm.NotTerminated(Population) && Algorithm.pro.FE < maxFE
                 MatingPool = TournamentSelection(2,Problem.N,FrontNo,-CrowdDis);
                 Offspring  = OperatorGA(Population(MatingPool));
                 [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
-                %%update all Populations
-                for k = 1 : length(Algopops)
-                    Algopops{k} = Population;
+                
+                %%HH: update all Populations
+                for k = 1 : length(Moeas_pops)
+                    Moeas_pops{k} = Population;
                 end
             end
         end
         
-        function Algopops = MOEAD(Algorithm, Algopops, Problem, maxFE, i)
+        
+        function Moeas_pops = NSGAIII(Algorithm, Moeas_pops, Problem, maxFE, i)
+            disp('NSGAIII')
+            disp(maxFE)
+            
+            %% Generate the reference points and random population
+            [Z,Problem.N] = UniformPoint(Problem.N,Problem.M);
+            Population = Moeas_pops{i};
+            Zmin          = min(Population(all(Population.cons<=0,2)).objs,[],1);
+
+            %% Optimization
+            while Algorithm.NotTerminated(Population) && Algorithm.pro.FE < maxFE
+                MatingPool = TournamentSelection(2,Problem.N,sum(max(0,Population.cons),2));
+                Offspring  = OperatorGA(Population(MatingPool));
+                Zmin       = min([Zmin;Offspring(all(Offspring.cons<=0,2)).objs],[],1);
+                Population = NSGAIIIEnvironmentalSelection([Population,Offspring],Problem.N,Z,Zmin);
+                
+                %%HH: update all Populations
+                for k = 1 : length(Moeas_pops)
+                    Moeas_pops{k} = Population;
+                end
+            end
+        end
+        
+        function Moeas_pops = MOEAD(Algorithm, Moeas_pops, Problem, maxFE, i)
             disp('MOEAD')
             disp(maxFE)
             %% Parameter setting
@@ -59,13 +94,12 @@ classdef FixedHHAlgorithm < ALGORITHM
             [~,B] = sort(B,2);
             B = B(:,1:T);
             
-            Population = Algopops{i};
+            Population = Moeas_pops{i};
             Z = min(Population.objs,[],1);
 
             %% Optimization
             while Algorithm.NotTerminated(Population) && Algorithm.pro.FE < maxFE
                 % For each solution
-                PopulationOld = Population;
                 for i = 1 : Problem.N
                     % Choose the parents
                     P = B(i,randperm(size(B,2)));
@@ -103,14 +137,9 @@ classdef FixedHHAlgorithm < ALGORITHM
                     end
                     Population(P(g_old>=g_new)) = Offspring;
                 end
-                %%update all Populations
-                [PopulationNSGAII,~,~] = NSGAIIEnvironmentalSelection([PopulationOld,Population],Problem.N);
-                for k = 1 : length(Algopops)
-                    if i == k
-                        Algopops{i} = Population
-                        continue
-                    end
-                    Algopops{k} = PopulationNSGAII;
+                %%HH: update all Populations
+                for k = 1 : length(Moeas_pops)
+                    Moeas_pops{k} = Population;
                 end
             end
         end
