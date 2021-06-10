@@ -15,7 +15,6 @@ classdef FixedHHAlgorithm < ALGORITHM
             
             %%available MOEAs
             moeas = {@NSGAII, @MOEAD, @NSGAIII};
-            %moeas_pops = NaN(1,length(moeas));
             moeas_pops = cell(1,length(moeas));
             for k = 1 : length(moeas_pops)
                 moeas_pops{k} = Population;
@@ -24,6 +23,7 @@ classdef FixedHHAlgorithm < ALGORITHM
             %%encoding defines which algorithm to apply based on index of the MOEA in 'moeas'
             encoding = {1,1,2,2,1,1,3,2,1,3};
             
+            %%max Function evaluations per Algorithm run
             maxFEperAlgo = Algorithm.pro.maxFE/(length(encoding));
             
             while Algorithm.NotTerminated(Population)
@@ -43,7 +43,7 @@ classdef FixedHHAlgorithm < ALGORITHM
             Population = Moeas_pops{i};
             [Population, FrontNo, CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
             
-            %%HH: apply EnvironmentalSelection and Update
+            %% HH: apply EnvironmentalSelection and Update
             if maxFE == 0
                 [Population,~,~] = NSGAIIEnvironmentalSelection([Population,NewPopulation],Problem.N);
                 Moeas_pops{i} = Population;
@@ -56,7 +56,7 @@ classdef FixedHHAlgorithm < ALGORITHM
                 Offspring  = OperatorGA(Population(MatingPool));
                 [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
                 
-                %%HH: update all Populations
+                %% HH: update all Populations
                 for k = 1 : length(Moeas_pops)
                     if i == k
                         Moeas_pops{k} = Population;
@@ -79,7 +79,7 @@ classdef FixedHHAlgorithm < ALGORITHM
             Population = Moeas_pops{i};
             Zmin          = min(Population(all(Population.cons<=0,2)).objs,[],1);
             
-            %%HH: apply EnvironmentalSelection and Update
+            %% HH: apply EnvironmentalSelection and Update
             if maxFE == 0
                 Population = NSGAIIIEnvironmentalSelection([Population,NewPopulation],Problem.N,Z,Zmin);
                 Moeas_pops{i} = Population;
@@ -93,7 +93,7 @@ classdef FixedHHAlgorithm < ALGORITHM
                 Zmin       = min([Zmin;Offspring(all(Offspring.cons<=0,2)).objs],[],1);
                 Population = NSGAIIIEnvironmentalSelection([Population,Offspring],Problem.N,Z,Zmin);
                 
-                %%HH: update all Populations
+                %% HH: update all Populations
                 for k = 1 : length(Moeas_pops)
                     if i == k
                         Moeas_pops{k} = Population;
@@ -125,7 +125,7 @@ classdef FixedHHAlgorithm < ALGORITHM
             Population = Moeas_pops{i};
             Z = min(Population.objs,[],1);
             
-            %%HH: apply EnvironmentalSelection and Update
+            %% HH: apply EnvironmentalSelection and Update
             if maxFE == 0
                 Moeas_pops{i} = NewPopulation;
                 return
@@ -171,7 +171,8 @@ classdef FixedHHAlgorithm < ALGORITHM
                     end
                     Population(P(g_old>=g_new)) = Offspring;
                 end
-                %%HH: update all Populations
+                
+                %% HH: update all Populations
                 for k = 1 : length(Moeas_pops)
                     if i == k
                         Moeas_pops{k} = Population;
