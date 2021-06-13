@@ -11,14 +11,28 @@ classdef HHProblem < PROBLEM
         %% Default settings of the problem
         function Setting(obj)
             obj.M = 1;
-            obj.D = 3;
-            obj.lower    = zeros(1,obj.D)-3;
-            obj.upper    = zeros(1,obj.D)+3;
-            obj.encoding = 'real';
+            obj.D = 1;
+            obj.lower    = ones(1,obj.D)*1;
+            obj.upper    = ones(1,obj.D)*3;
+            obj.encoding = 'real';          
         end
         %% Calculate objective values
         function PopObj = CalObj(obj,PopDec)
-            PopObj = -sum(PopDec.^4,2);
+            % problem auslesen <= HHProblem
+            tmp = PROBLEM.Current();
+            subProblem = @DTLZ2;
+            subProblem = subProblem();
+            subAlgorithm = @MOPSO;
+            subAlgorithm = subAlgorithm();
+            
+            subAlgorithm.Solve(subProblem);
+            PopObj = zeros(obj.N);
+            for i = 1 : obj.N
+                res = HV(subAlgorithm.result{end}, subProblem.optimum);
+                PopObj(i) = res;
+            end
+            disp(PopObj)
+            PROBLEM.Current(tmp);
         end
     end
 end
