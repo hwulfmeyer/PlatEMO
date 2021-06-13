@@ -26,12 +26,11 @@ classdef HHProblem < PROBLEM
             subAlgorithm = subAlgorithm();
             
             subAlgorithm.Solve(subProblem);
-            PopObj = zeros(obj.N);
+            res = HV(subAlgorithm.result{end}, subProblem.optimum);
+            PopObj = zeros(obj.N,obj.M);
             for i = 1 : obj.N
-                res = HV(subAlgorithm.result{end}, subProblem.optimum);
-                PopObj(i) = res;
+                PopObj(i) = res + (i/obj.N);
             end
-            disp(PopObj)
             PROBLEM.Current(tmp);
         end
     end
