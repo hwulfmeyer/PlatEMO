@@ -11,6 +11,7 @@ classdef FixedHHAlgorithm < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Generate random population
+            
             Population = Problem.Initialization();
             
             %%available MOEAs
@@ -26,11 +27,9 @@ classdef FixedHHAlgorithm < ALGORITHM
             %%max Function evaluations per Algorithm run
             maxFEperAlgo = Algorithm.pro.maxFE/(length(encoding));
             
-            while Algorithm.NotTerminated(Population)
-                for i = 1 : length(encoding)
-                    moea_index = encoding{i};
-                    moeas_pops = moeas{moea_index}(Algorithm, moeas_pops, Problem, maxFEperAlgo*i, moea_index, NaN, moeas);
-                end
+            for i = 1 : length(encoding)
+                moea_index = encoding{i};
+                moeas_pops = moeas{moea_index}(Algorithm, moeas_pops, Problem, maxFEperAlgo*i, moea_index, NaN, moeas);
             end
         end
         
@@ -62,7 +61,7 @@ classdef FixedHHAlgorithm < ALGORITHM
                         Moeas_pops{k} = Population;
                         continue
                     end
-                    Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Population, Moeas);
+                    Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Offspring, Moeas);
                 end
             end
         end
@@ -99,7 +98,7 @@ classdef FixedHHAlgorithm < ALGORITHM
                         Moeas_pops{k} = Population;
                         continue
                     end
-                    Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Population, Moeas);
+                    Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Offspring, Moeas);
                 end
             end
         end
@@ -124,9 +123,10 @@ classdef FixedHHAlgorithm < ALGORITHM
             
             Population = Moeas_pops{i};
             Z = min(Population.objs,[],1);
-            
+
             %% HH: apply EnvironmentalSelection and Update
             if maxFE == 0
+                %% apply scalarization
                 Moeas_pops{i} = NewPopulation;
                 return
             end
