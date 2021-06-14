@@ -1,7 +1,10 @@
 classdef HHProblem < PROBLEM
 % <single> <real> 
-% subProbMaxFE --- 10000 --- maxFE for the underlying Problem
-% subProbN --- 100 --- population number of the underlying Problem
+% subProbMaxFE	--- 10000 --- maxFE for the underlying Problem
+% subProbN      --- 100 --- population number of the underlying Problem
+% subProblem	--- @DTLZ2 --- Pointer to the underlying Problem
+
+%------------------------------- Copyright --------------------------------
 % Copyright (C) 2021 Hans-Martin Wulfmeyer
 
 % This work is licensed under the Creative Commons Attribution-NonCommercial-ShareAlike 4.0 
@@ -9,36 +12,34 @@ classdef HHProblem < PROBLEM
 % visit http://creativecommons.org/licenses/by-nc-sa/4.0/
 %--------------------------------------------------------------------------
     properties(Access = private)
-        subProbMaxFE = 10000;
-        subProbN = 100;
+        subProbMaxFE; % maxFE for the underlying Problem
+        subProbN; % population number of the underlying Problem
+        subProblem; % Pointer to the underlying Problem
     end
     methods
         %% Default settings of the problem
         function Setting(obj)
-            obj.subProbMaxFE = obj.ParameterSet(9999); %does not work yet, is not properly set
-            obj.subProbN = obj.ParameterSet(95);
+            [obj.subProbMaxFE, obj.subProbN, obj.subProblem] = obj.ParameterSet(10000, 100, @DTLZ2);
             obj.M = 1;
-            obj.D = 1;
+            obj.D = 1;        
             obj.lower    = ones(1,obj.D)*1;
             obj.upper    = ones(1,obj.D)*50;
             obj.encoding = 'real';          
         end
         %% Calculate objective values
         function PopObj = CalObj(obj,PopDec)
-            tmp = PROBLEM.Current();
-            subProblem = @DTLZ2;
-            subProblem = subProblem('N', obj.subProbN, 'maxFE', obj.subProbMaxFE);
-            disp(subProblem.N);
-            disp(subProblem.maxFE);
-            subAlgorithm = @MOPSO;     
+            curProblem = PROBLEM.Current();
+            sPRO = obj.subProblem('N', obj.subProbN, 'maxFE', obj.subProbMaxFE);
+            sALG = @MOPSO;     
             PopObj = zeros(obj.N,obj.M);
-            for i = 1 : obj.N
-                algo = subAlgorithm('parameter', {PopDec(i)}, 'save', 1);
-                algo.Solve(subProblem);
-                res = 1/HV(algo.result{end}, subProblem.optimum);
+            parfor (i = 1 : obj.N)
+                algo = sALG('parameter', {PopDec(i)}, 'save', 1);
+                algo.Solve(sPRO);
+                res = 1/HV(algo.result{end}, sPRO.optimum);
                 PopObj(i) = res;
             end
-            PROBLEM.Current(tmp);
+            disp(elapsed)
+            PROBLEM.Current(curProblem);
         end
     end
 end
