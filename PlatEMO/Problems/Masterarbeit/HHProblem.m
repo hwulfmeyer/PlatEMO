@@ -35,10 +35,9 @@ classdef HHProblem < PROBLEM
             parfor (i = 1 : obj.N)
                 algo = sALG('parameter', {PopDec(i)}, 'save', 1);
                 algo.Solve(sPRO);
-                res = 1/HV(algo.result{end}, sPRO.optimum);
+                res = -HV(algo.result{end}, sPRO.optimum);
                 PopObj(i) = res;
             end
-            disp(elapsed)
             PROBLEM.Current(curProblem);
         end
     end
