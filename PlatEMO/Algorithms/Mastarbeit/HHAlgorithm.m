@@ -1,6 +1,8 @@
-classdef FixedHHAlgorithm < ALGORITHM
+classdef HHAlgorithm < ALGORITHM
 % <multi> <real/binary/permutation>
 % MOEA Hyper-Heuristic
+% enc --- [1,1,1,1] --- defines which algorithm to apply based on index of the MOEA in 'moeas'
+            
 
 %------------------------------- Copyright --------------------------------
 % Copyright (C) 2021 Hans-Martin Wulfmeyer
@@ -9,27 +11,25 @@ classdef FixedHHAlgorithm < ALGORITHM
 % International License. (CC BY-NC-SA 4.0). To view a copy of this license, 
 % visit http://creativecommons.org/licenses/by-nc-sa/4.0/
 %--------------------------------------------------------------------------
+
     methods
         function main(Algorithm,Problem)
             %% Generate random population
-            
+            encoding = Algorithm.ParameterSet(ones(1,10));
             Population = Problem.Initialization();
             
             %%available MOEAs
-            moeas = {@NSGAII, @MOEAD, @NSGAIII};
+            moeas = {@NSGAII, @NSGAIII, @MOEAD};
             moeas_pops = cell(1,length(moeas));
             for k = 1 : length(moeas_pops)
                 moeas_pops{k} = Population;
             end
             
-            %%encoding defines which algorithm to apply based on index of the MOEA in 'moeas'
-            encoding = {1,1,2,2,1,1,3,2,1,3};
-            
             %%max Function evaluations per Algorithm run
             maxFEperAlgo = Algorithm.pro.maxFE/(length(encoding));
             
             for i = 1 : length(encoding)
-                moea_index = encoding{i};
+                moea_index = encoding(i);
                 moeas_pops = moeas{moea_index}(Algorithm, moeas_pops, Problem, maxFEperAlgo*i, moea_index, NaN, moeas);
             end
         end
