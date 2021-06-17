@@ -11,7 +11,8 @@ classdef HHAlgorithm < ALGORITHM
 % International License. (CC BY-NC-SA 4.0). To view a copy of this license, 
 % visit http://creativecommons.org/licenses/by-nc-sa/4.0/
 %--------------------------------------------------------------------------
-
+% platemo('algorithm',{@HHAlgorithm, [1,2,3,1,3,2,1]},'problem',@DTLZ2,'N',100,'maxFE',10000,'save',0);
+%
     methods
         function main(Algorithm,Problem)
             %% Generate random population

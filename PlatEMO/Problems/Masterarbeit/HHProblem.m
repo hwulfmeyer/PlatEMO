@@ -13,6 +13,7 @@ classdef HHProblem < PROBLEM
 % platemo('algorithm',@GA,'problem',{@HHProblem,10000,100,@DTLZ2},'D',4,'N',4,'maxFE',20, 'save',0);
 % subProbMaxFE should be at least subProbMaxFE/subProbN should be
 % divideable by D
+
     properties(Access = private)
         subProbMaxFE; % maxFE for the underlying Problem
         subProbN; % population number of the underlying Problem
@@ -24,7 +25,7 @@ classdef HHProblem < PROBLEM
         function Setting(obj)
             [obj.subProbMaxFE, obj.subProbN, obj.subProblem] = obj.ParameterSet(10000, 100, @DTLZ2);
             obj.M = 1;
-            if isempty(obj.D); obj.D = 10; end % number of algorithms per run
+            if isempty(obj.D); obj.D = 4; end % number of algorithms per run
             obj.lower    = ones(1,obj.D)*1;
             obj.upper    = ones(1,obj.D)*3;
             obj.encoding = 'real';
