@@ -74,7 +74,7 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
                 obj.pro.FE = 0;
                 addpath(fileparts(which(class(obj))));
                 addpath(fileparts(which(class(obj.pro))));
-                tic; obj.main(PROBLEM.Current(obj.pro));
+                tic;obj.main(PROBLEM.Current(obj.pro));
             catch err
                 if ~strcmp(err.identifier,'PlatEMO:Termination')
                     rethrow(err);
@@ -134,7 +134,10 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
     methods(Static, Sealed)
         function Output(Algorithm,Problem)
         % The default output function of ALGORITHM.
-            clc; fprintf('%s on %d-objective %d-variable %s (%6.2f%%), %.2fs passed...\n',class(Algorithm),Problem.M,Problem.D,class(Problem),Problem.FE/Problem.maxFE*100,Algorithm.metric.runtime);
+            %% commented out by me!
+            %clc; 
+            %fprintf('%s on %d-objective %d-variable %s (%6.2f%%), %.2fs passed...\n',class(Algorithm),Problem.M,Problem.D,class(Problem),Problem.FE/Problem.maxFE*100,Algorithm.metric.runtime);
+            %%
             if Problem.FE >= Problem.maxFE
                 if Algorithm.save == 0
                     if Problem.M > 1

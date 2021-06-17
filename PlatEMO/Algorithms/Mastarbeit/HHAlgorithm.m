@@ -1,7 +1,7 @@
 classdef HHAlgorithm < ALGORITHM
 % <multi> <real/binary/permutation>
 % MOEA Hyper-Heuristic
-% enc --- [1,1,1,1] --- defines which algorithm to apply based on index of the MOEA in 'moeas'
+% encoding  --- [1,1,1,1] --- defines which algorithm to apply based on index of the MOEA in 'moeas'
             
 
 %------------------------------- Copyright --------------------------------
@@ -15,7 +15,7 @@ classdef HHAlgorithm < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Generate random population
-            encoding = Algorithm.ParameterSet(ones(1,10));
+            encoding = Algorithm.ParameterSet([1,1,2,2,1,1,3,2,1,3]);
             Population = Problem.Initialization();
             
             %%available MOEAs
@@ -35,11 +35,6 @@ classdef HHAlgorithm < ALGORITHM
         end
         
         function Moeas_pops = NSGAII(Algorithm, Moeas_pops, Problem, maxFE, i, NewPopulation, Moeas)
-            if maxFE > 0
-                disp(Moeas{i})
-                disp(maxFE)
-            end
-            
             Population = Moeas_pops{i};
             [Population, FrontNo, CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
             
@@ -69,11 +64,6 @@ classdef HHAlgorithm < ALGORITHM
         
         
         function Moeas_pops = NSGAIII(Algorithm, Moeas_pops, Problem, maxFE, i, NewPopulation, Moeas)
-            if maxFE > 0
-                disp(Moeas{i})
-                disp(maxFE)
-            end
-            
             %% Generate the reference points and random population
             [Z,Problem.N] = UniformPoint(Problem.N,Problem.M);
             Population = Moeas_pops{i};
@@ -83,7 +73,7 @@ classdef HHAlgorithm < ALGORITHM
             if maxFE == 0
                 Population = NSGAIIIEnvironmentalSelection([Population,NewPopulation],Problem.N,Z,Zmin);
                 Moeas_pops{i} = Population;
-                return
+                return;
             end
             
             %% Optimization
@@ -97,7 +87,7 @@ classdef HHAlgorithm < ALGORITHM
                 for k = 1 : length(Moeas_pops)
                     if i == k
                         Moeas_pops{k} = Population;
-                        continue
+                        continue;
                     end
                     Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Offspring, Moeas);
                 end
@@ -105,11 +95,6 @@ classdef HHAlgorithm < ALGORITHM
         end
         
         function Moeas_pops = MOEAD(Algorithm, Moeas_pops, Problem, maxFE, i, NewPopulation, Moeas)
-            if maxFE > 0
-                disp(Moeas{i})
-                disp(maxFE)
-            end
-            
             %% Parameter setting
             type = 1;
 
@@ -128,7 +113,9 @@ classdef HHAlgorithm < ALGORITHM
             %% HH: apply EnvironmentalSelection and Update
             if maxFE == 0
                 %% apply scalarization
-                Moeas_pops{i} = NewPopulation;
+                %%TODO%%
+                [Population,~,~] = NSGAIIEnvironmentalSelection([Population,NewPopulation],Problem.N);
+                Moeas_pops{i} = Population;
                 return
             end
             
@@ -177,7 +164,7 @@ classdef HHAlgorithm < ALGORITHM
                 for k = 1 : length(Moeas_pops)
                     if i == k
                         Moeas_pops{k} = Population;
-                        continue
+                        continue;
                     end
                     Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Population, Moeas);
                 end
