@@ -1,4 +1,4 @@
-function [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection(Population,N)
+function [Population,FrontNo,CrowdDis] = HH_NSGAIIEnvironmentalSelection(Population,N)
 % The environmental selection of NSGA-II
 
 %------------------------------- Copyright --------------------------------

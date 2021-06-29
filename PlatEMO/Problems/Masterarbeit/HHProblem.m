@@ -45,12 +45,9 @@ classdef HHProblem < PROBLEM
             sALG = @HHAlgorithm;
             PopObj = zeros(obj.N,obj.M);
             parfor i = 1 : obj.N
-                %TODO: 3/5/7/11 runs and median
                 algo = sALG('parameter', {PopDec(i,:)}, 'save', -1);
                 pro = sPRO('N', sProN, 'maxFE', sProFE);
                 algo.Solve(pro);
-                %res = -HV(algo.result{end}, pro.optimum);
-                %spread & GD
                 res = IGD(algo.result{end}, pro.optimum);
                 PopObj(i) = res;
             end

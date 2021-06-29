@@ -11,91 +11,45 @@ classdef HHAlgorithm < ALGORITHM
 % International License. (CC BY-NC-SA 4.0). To view a copy of this license, 
 % visit http://creativecommons.org/licenses/by-nc-sa/4.0/
 %--------------------------------------------------------------------------
-% platemo('algorithm',{@HHAlgorithm, [1,2,3,1,3,2,1]},'problem',@DTLZ2,'N',100,'maxFE',10000,'save',0);
+% platemo('algorithm',{@HHAlgorithm, [1,1,1,1]},'problem',@DTLZ2,'N',100,'maxFE',10000,'save',0);
 %
+    properties
+        moeas = {HH_NSGAIII, HH_NSGAII, HH_NSGAII}; %available MOEAs
+        moeas_pops;
+    end
     methods
         function main(Algorithm,Problem)
             %% Generate random population
-            encoding = Algorithm.ParameterSet([1,1,2,2,1,1,3,2,1,3]);
+            encoding = Algorithm.ParameterSet([1,1,1,1]);
             Population = Problem.Initialization();
             
-            %%available MOEAs
-            moeas = {@NSGAII, @NSGAIII, @MOEAD};
-            moeas_pops = cell(1,length(moeas));
-            for k = 1 : length(moeas_pops)
-                moeas_pops{k} = Population;
+            Algorithm.moeas_pops = cell(1,length(Algorithm.moeas));
+            for k = 1 : length(Algorithm.moeas_pops)
+                Algorithm.moeas_pops{k} = Population;
             end
             
             %%max Function evaluations per Algorithm run
             maxFEperAlgo = Algorithm.pro.maxFE/(length(encoding));
-            
             for i = 1 : length(encoding)
                 moea_index = encoding(i);
-                moeas_pops = moeas{moea_index}(Algorithm, moeas_pops, Problem, maxFEperAlgo*i, moea_index, NaN, moeas);
-            end
-        end
-        
-        function Moeas_pops = NSGAII(Algorithm, Moeas_pops, Problem, maxFE, i, NewPopulation, Moeas)
-            Population = Moeas_pops{i};
-            [Population, FrontNo, CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
-            
-            %% HH: apply EnvironmentalSelection and Update
-            if maxFE == 0
-                [Population,~,~] = NSGAIIEnvironmentalSelection([Population,NewPopulation],Problem.N);
-                Moeas_pops{i} = Population;
-                return
-            end
-            
-            %% Optimization
-            while Algorithm.NotTerminated(Population) && Algorithm.pro.FE < maxFE
-                MatingPool = TournamentSelection(2,Problem.N,FrontNo,-CrowdDis);
-                Offspring  = OperatorGA(Population(MatingPool));
-                [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
-                
-                %% HH: update all Populations
-                for k = 1 : length(Moeas_pops)
-                    if i == k
-                        Moeas_pops{k} = Population;
-                        continue
-                    end
-                    Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Offspring, Moeas);
+                Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFEperAlgo*i, moea_index);
+                if ~Algorithm.NotTerminated(Algorithm.moeas_pops{moea_index})
+                    return
                 end
             end
         end
         
-        
-        function Moeas_pops = NSGAIII(Algorithm, Moeas_pops, Problem, maxFE, i, NewPopulation, Moeas)
-            %% Generate the reference points and random population
-            [Z,Problem.N] = UniformPoint(Problem.N,Problem.M);
-            Population = Moeas_pops{i};
-            Zmin          = min(Population(all(Population.cons<=0,2)).objs,[],1);
-            
-            %% HH: apply EnvironmentalSelection and Update
-            if maxFE == 0
-                Population = NSGAIIIEnvironmentalSelection([Population,NewPopulation],Problem.N,Z,Zmin);
-                Moeas_pops{i} = Population;
-                return;
-            end
-            
-            %% Optimization
-            while Algorithm.NotTerminated(Population) && Algorithm.pro.FE < maxFE
-                MatingPool = TournamentSelection(2,Problem.N,sum(max(0,Population.cons),2));
-                Offspring  = OperatorGA(Population(MatingPool));
-                Zmin       = min([Zmin;Offspring(all(Offspring.cons<=0,2)).objs],[],1);
-                Population = NSGAIIIEnvironmentalSelection([Population,Offspring],Problem.N,Z,Zmin);
-                
-                %% HH: update all Populations
-                for k = 1 : length(Moeas_pops)
-                    if i == k
-                        Moeas_pops{k} = Population;
-                        continue;
-                    end
-                    Moeas_pops = Moeas{k}(Algorithm, Moeas_pops, Problem, 0, k, Offspring, Moeas);
+        function update_populations(Algorithm, Problem, i, Offspring)
+            for k = 1 : length(Algorithm.moeas)
+                if i == k
+                    continue
                 end
-            end
+                Algorithm.moeas{k}.update(Algorithm, Problem, k, Offspring);
+           end
         end
         
-        function Moeas_pops = MOEAD(Algorithm, Moeas_pops, Problem, maxFE, i, NewPopulation, Moeas)
+        
+        function Moeas_pops = HH_MOEAD(Algorithm, Moeas_pops, Problem, maxFE, i, NewPopulation, Moeas)
             %% Parameter setting
             type = 1;
 
