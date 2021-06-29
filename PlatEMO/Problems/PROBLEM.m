@@ -111,6 +111,8 @@ classdef PROBLEM < handle & matlab.mixin.Heterogeneous
                     PopDec = randi([0,1],N,obj.D);
                 case 'permutation'
                     [~,PopDec] = sort(rand(N,obj.D),2);
+                case 'integer'
+                    PopDec = randi([obj.lower,obj.upper],N,obj.D);
                 otherwise
                     PopDec = unifrnd(repmat(obj.lower,N,1),repmat(obj.upper,N,1));
             end

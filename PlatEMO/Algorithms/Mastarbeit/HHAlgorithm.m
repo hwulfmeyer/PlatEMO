@@ -1,5 +1,5 @@
 classdef HHAlgorithm < ALGORITHM
-% <multi> <real/binary/permutation>
+% <multi> <integer>
 % MOEA Hyper-Heuristic
 % encoding  --- [1,1,1,1] --- defines which algorithm to apply based on index of the MOEA in 'moeas'
             
