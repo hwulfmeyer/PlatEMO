@@ -17,7 +17,9 @@ classdef HH_NSGAII
         end
 
         function update(~, Algorithm, Problem, i, Offspring)
-            [Algorithm.moeas_pops{i},~,~] = HH_NSGAIIEnvironmentalSelection([Algorithm.moeas_pops{i},Offspring],Problem.N);
+            Population = Algorithm.moeas_pops{i};
+            [Population,~,~] = HH_NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
+            Algorithm.moeas_pops{i} = Population;
         end
     end
 end

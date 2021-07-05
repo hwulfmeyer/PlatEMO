@@ -61,6 +61,16 @@ function Offspring = OperatorGAhalf(Parent,Parameter)
                     Offspring(i,:) = Offspring(i,[1:k(i)-1,k(i)+1:s(i)-1,k(i),s(i):end]);
                 end
             end
+        case 'integer'
+            %% Genetic operators for integer encoding (similar to binary)
+            % Uniform crossover
+            k = rand(N,D) < 0.5;
+            k(repmat(rand(N,1)>proC,1,D)) = false;
+            Offspring    = Parent1;
+            Offspring(k) = Parent2(k);
+            % random mutation
+            Site = rand(N,D) < proM/D;
+            Offspring(Site) = randi([Problem.lower,Problem.upper],length(Offspring(Site)),1);
         otherwise
             %% Genetic operators for real encoding
             % Simulated binary crossover

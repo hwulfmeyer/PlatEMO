@@ -136,7 +136,7 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
         % The default output function of ALGORITHM.
             %% commented out by me!
             %clc; 
-            %fprintf('%s on %d-objective %d-variable %s (%6.2f%%), %.2fs passed...\n',class(Algorithm),Problem.M,Problem.D,class(Problem),Problem.FE/Problem.maxFE*100,Algorithm.metric.runtime);
+            fprintf('%s on %d-objective %d-variable %s (%6.2f%%), %.2fs passed...\n',class(Algorithm),Problem.M,Problem.D,class(Problem),Problem.FE/Problem.maxFE*100,Algorithm.metric.runtime);
             %%
             if Problem.FE >= Problem.maxFE
                 if Algorithm.save == 0
