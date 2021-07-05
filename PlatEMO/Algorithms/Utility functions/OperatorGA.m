@@ -104,7 +104,8 @@ function Offspring = OperatorGA(Parent,Parameter)
             Offspring     = [Offspring1;Offspring2];
             % random mutation
             Site = rand(2*N,D) < proM/D;
-            Offspring(Site) = randi([Problem.lower,Problem.upper],length(Offspring(Site)),1);
+            Randomize = randi([Problem.lower,Problem.upper],size(Offspring));
+            Offspring(Site) = Randomize(Site);
         otherwise
             %% Genetic operators for real encoding
             % Simulated binary crossover

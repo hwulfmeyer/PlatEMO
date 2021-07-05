@@ -24,15 +24,16 @@ classdef HHProblem < PROBLEM
         subProblem; % Pointer to the underlying Problem
         subProbN; % population number of the underlying Problem
         subProbMaxFE; % maxFE for the underlying Problem
+        hhAlgorithm = @HHAlgorithm;
     end
     methods
         %% Default settings of the problem
         function Setting(obj)
             [obj.subProblem, obj.subProbN, obj.subProbMaxFE] = obj.ParameterSet(@DTLZ2, 100, 10000);
             obj.M = 1;
-            if isempty(obj.D); obj.D = 4; end % number of algorithms per run
+            if isempty(obj.D); obj.D = 10; end % number of algorithms per run
             obj.lower    = 1;
-            obj.upper    = 3;
+            obj.upper    = length(obj.hhAlgorithm().moeas);
             obj.encoding = 'integer';
         end
         
@@ -42,13 +43,13 @@ classdef HHProblem < PROBLEM
             sPRO = obj.subProblem;
             sProN = obj.subProbN;
             sProFE = obj.subProbMaxFE;
-            sALG = @HHAlgorithm;
+            sALG = obj.hhAlgorithm;
             PopObj = zeros(obj.N,obj.M);
-            parfor i = 1 : obj.N
+            for i = 1 : obj.N
                 algo = sALG('parameter', {PopDec(i,:)}, 'save', -1);
                 pro = sPRO('N', sProN, 'maxFE', sProFE);
                 algo.Solve(pro);
-                res = IGD(algo.result{end}, pro.optimum);
+                res = -HV(algo.hhresult, pro.optimum);
                 PopObj(i) = res;
             end
             PROBLEM.Current(curProblem);

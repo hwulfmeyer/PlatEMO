@@ -17,11 +17,12 @@ classdef HH_MOEAD
 %--------------------------------------------------------------------------
 
     methods
-        function main(~, Algorithm, Problem, maxFE, i)
+        function main(~, Algorithm, Problem, maxFE, k)
             %% Parameter setting
             %type = Algorithm.ParameterSet(1);
             type = 1;
 
+            
             %% Generate the weight vectors
             [W,Problem.N] = UniformPoint(Problem.N,Problem.M);
             T = ceil(Problem.N/10);
@@ -32,7 +33,7 @@ classdef HH_MOEAD
             B = B(:,1:T);
 
             %% get population
-            Population = Algorithm.moeas_pops{i};
+            Population = Algorithm.moeas_pops{k};
             Z = min(Population.objs,[],1);
 
             %% Optimization
@@ -78,18 +79,55 @@ classdef HH_MOEAD
                 end
                 
                 %% HH: update all Populations
-                Algorithm.moeas_pops{i} = Population;
-                Algorithm.update_populations(Problem, i, offspringsave);
+                Algorithm.moeas_pops{k} = Population;
+                Algorithm.update_populations(Problem, k, offspringsave);
             end
         end
         
-        function update(~, Algorithm, Problem, i, Offspring)
-            %%TODO own Environmental Selection
-            [Z,Problem.N] = UniformPoint(Problem.N,Problem.M);
-            Population = Algorithm.moeas_pops{i};
-            Zmin       = min(Population(all(Population.cons<=0,2)).objs,[],1);
-            Zmin       = min([Zmin;Offspring(all(Offspring.cons<=0,2)).objs],[],1);
-            Algorithm.moeas_pops{i} = HH_NSGAIIIEnvironmentalSelection([Population,Offspring],Problem.N,Z,Zmin);
+        function update(~, Algorithm, Problem, k, Offsprings)
+            Population = Algorithm.moeas_pops{k};
+            [W,Problem.N] = UniformPoint(Problem.N,Problem.M);
+            for i = 1 : length(Offsprings)
+                % Choose the parents
+                % Generate an offspring
+                Offspring = Offsprings{i};
+                
+                % j is the neighborhood of i
+                j = pdist2(Offspring.obj, W, 'cosine'); %%TODO get maximum
+
+                P = B(j, randperm(size(B,2)));
+          
+                % Update the ideal point
+                %% todo: class variable
+                Z = min(Z,Offspring.obj);
+
+                % Update the neighbours
+                switch type
+                    case 1
+                        % PBI approach
+                        normW   = sqrt(sum(W(P,:).^2,2));
+                        normP   = sqrt(sum((Population(P).objs-repmat(Z,T,1)).^2,2));
+                        normO   = sqrt(sum((Offspring.obj-Z).^2,2));
+                        CosineP = sum((Population(P).objs-repmat(Z,T,1)).*W(P,:),2)./normW./normP;
+                        CosineO = sum(repmat(Offspring.obj-Z,T,1).*W(P,:),2)./normW./normO;
+                        g_old   = normP.*CosineP + 5*normP.*sqrt(1-CosineP.^2);
+                        g_new   = normO.*CosineO + 5*normO.*sqrt(1-CosineO.^2);
+                    case 2
+                        % Tchebycheff approach
+                        g_old = max(abs(Population(P).objs-repmat(Z,T,1)).*W(P,:),[],2);
+                        g_new = max(repmat(abs(Offspring.obj-Z),T,1).*W(P,:),[],2);
+                    case 3
+                        % Tchebycheff approach with normalization
+                        Zmax  = max(Population.objs,[],1);
+                        g_old = max(abs(Population(P).objs-repmat(Z,T,1))./repmat(Zmax-Z,T,1).*W(P,:),[],2);
+                        g_new = max(repmat(abs(Offspring.obj-Z)./(Zmax-Z),T,1).*W(P,:),[],2);
+                    case 4
+                        % Modified Tchebycheff approach
+                        g_old = max(abs(Population(P).objs-repmat(Z,T,1))./W(P,:),[],2);
+                        g_new = max(repmat(abs(Offspring.obj-Z),T,1)./W(P,:),[],2);
+                end
+                Population(P(g_old>=g_new)) = Offspring;
+            end
         end
     end
 end

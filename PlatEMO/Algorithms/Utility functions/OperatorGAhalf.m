@@ -70,7 +70,8 @@ function Offspring = OperatorGAhalf(Parent,Parameter)
             Offspring(k) = Parent2(k);
             % random mutation
             Site = rand(N,D) < proM/D;
-            Offspring(Site) = randi([Problem.lower,Problem.upper],length(Offspring(Site)),1);
+            Randomize = randi([Problem.lower,Problem.upper],size(Offspring));
+            Offspring(Site) = Randomize(Site);
         otherwise
             %% Genetic operators for real encoding
             % Simulated binary crossover

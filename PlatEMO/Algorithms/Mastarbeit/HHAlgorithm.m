@@ -13,9 +13,12 @@ classdef HHAlgorithm < ALGORITHM
 %--------------------------------------------------------------------------
 % platemo('algorithm',{@HHAlgorithm, [1,1,1,1]},'problem',@DTLZ2,'N',100,'maxFE',10000,'save',0);
 %
+    properties(Constant)
+        moeas = {HH_NSGAIII, HH_NSGAII, HH_GLMO, HH_MOEADD}; %available MOEAs 
+    end
     properties
-        moeas = {HH_NSGAIII, HH_NSGAII, HH_MOEAD}; %available MOEAs
         moeas_pops;
+        hhresult;
     end
     methods
         function main(Algorithm,Problem)
@@ -33,14 +36,15 @@ classdef HHAlgorithm < ALGORITHM
             for i = 1 : length(encoding)
                 moea_index = encoding(i);
                 Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFEperAlgo*i, moea_index);
-                if ~Algorithm.NotTerminated(Algorithm.moeas_pops{moea_index})
+                if Algorithm.pro.FE >= Algorithm.pro.maxFE
+                    Algorithm.hhresult = Algorithm.moeas_pops{moea_index};
                     return
                 end
             end
         end
         
         function update_populations(Algorithm, Problem, i, Offspring)
-            for k = 1 : length(Algorithm.moeas)
+           for k = 1 : length(Algorithm.moeas)
                 if i == k
                     continue
                 end
