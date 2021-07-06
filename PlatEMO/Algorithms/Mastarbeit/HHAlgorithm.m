@@ -2,8 +2,8 @@ classdef HHAlgorithm < ALGORITHM
 % <multi> <integer>
 % MOEA Hyper-Heuristic
 % encoding  --- [1,1,1,1] --- defines which algorithm to apply based on index of the MOEA in 'moeas'
+% hhRun --- 1 --- if the algorithm is run inside the HHProblem (1) or not (0)
             
-
 %------------------------------- Copyright --------------------------------
 % Copyright (C) 2021 Hans-Martin Wulfmeyer
 %
@@ -14,7 +14,7 @@ classdef HHAlgorithm < ALGORITHM
 % platemo('algorithm',{@HHAlgorithm, [1,1,1,1]},'problem',@DTLZ2,'N',100,'maxFE',10000,'save',0);
 %
     properties(Constant)
-        moeas = {HH_NSGAIII, HH_NSGAII, HH_GLMO, HH_MOEADD}; %available MOEAs 
+        moeas = {HH_NSGAIII, HH_NSGAII, HH_GLMO, HH_MOEAD, HH_MOEADD, HH_MOMBIII, HH_SPEA2, HH_SPEA2SDE}; %available MOEAs 
     end
     properties
         moeas_pops;
@@ -23,7 +23,7 @@ classdef HHAlgorithm < ALGORITHM
     methods
         function main(Algorithm,Problem)
             %% Generate random population
-            encoding = Algorithm.ParameterSet([1,1,1,1]);
+            [encoding, hhRun] = Algorithm.ParameterSet([1,1,1,1], 1);
             Population = Problem.Initialization();
             
             Algorithm.moeas_pops = cell(1,length(Algorithm.moeas));
@@ -36,9 +36,16 @@ classdef HHAlgorithm < ALGORITHM
             for i = 1 : length(encoding)
                 moea_index = encoding(i);
                 Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFEperAlgo*i, moea_index);
-                if Algorithm.pro.FE >= Algorithm.pro.maxFE
-                    Algorithm.hhresult = Algorithm.moeas_pops{moea_index};
-                    return
+                
+                if hhRun == 1               
+                    if Algorithm.pro.FE >= Algorithm.pro.maxFE
+                        Algorithm.hhresult = Algorithm.moeas_pops{moea_index};
+                        return
+                    end
+                else
+                    if ~Algorithm.NotTerminated(Algorithm.moeas_pops{moea_index})
+                        return
+                    end
                 end
             end
         end
@@ -48,7 +55,7 @@ classdef HHAlgorithm < ALGORITHM
                 if i == k
                     continue
                 end
-                Algorithm.moeas{k}.update(Algorithm, Problem, k, Offspring);
+                Algorithm.moeas_pops{k} = Algorithm.moeas{k}.update(Algorithm.moeas_pops{k}, Problem, Offspring);
            end
         end
     end

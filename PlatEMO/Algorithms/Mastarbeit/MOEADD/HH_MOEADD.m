@@ -119,12 +119,11 @@ classdef HH_MOEADD
             end
         end
         
-        function update(~, Algorithm, Problem, k, Offsprings)
+        function Population = update(~, Population, Problem, Offsprings)
             %% Generate the weight vectors
             [W,Problem.N] = UniformPoint(Problem.N,Problem.M);
 
             %% Generate random population
-            Population = Algorithm.moeas_pops{k};
             [~,Region] = max(1-pdist2(Population.objs,W,'cosine'),[],2);
             FrontNo    = NDSort(Population.objs,inf);
             Z          = min(Population.objs,[],1);
@@ -193,8 +192,6 @@ classdef HH_MOEADD
                 Region(x)     = [];
                 FrontNo       = UpdateFront(Population.objs,FrontNo,x);
             end
-            
-            Algorithm.moeas_pops{k} = Population;
         end
     end
 end

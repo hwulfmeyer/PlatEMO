@@ -1,7 +1,7 @@
 classdef HH_NSGAII
     methods
-        function main(~, Algorithm, Problem, maxFE, i)
-            Population = Algorithm.moeas_pops{i};
+        function main(~, Algorithm, Problem, maxFE, k)
+            Population = Algorithm.moeas_pops{k};
             [Population, FrontNo, CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
 
             %% Optimization
@@ -11,15 +11,13 @@ classdef HH_NSGAII
                 [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
 
                 %% HH: update all Populations
-                Algorithm.moeas_pops{i} = Population;
-                Algorithm.update_populations(Problem, i, Offspring);
+                Algorithm.moeas_pops{k} = Population;
+                Algorithm.update_populations(Problem, k, Offspring);
             end
         end
 
-        function update(~, Algorithm, Problem, i, Offspring)
-            Population = Algorithm.moeas_pops{i};
+        function Population = update(~, Population, Problem, Offspring)
             [Population,~,~] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
-            Algorithm.moeas_pops{i} = Population;
         end
     end
 end

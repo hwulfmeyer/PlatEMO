@@ -19,12 +19,11 @@ classdef HH_NSGAIII
             end
         end
 
-        function update(~, Algorithm, Problem, i, Offspring)
+        function Population = update(~, Population, Problem, Offspring)
             [Z,Problem.N] = UniformPoint(Problem.N,Problem.M);
-            Population = Algorithm.moeas_pops{i};
             Zmin       = min(Population(all(Population.cons<=0,2)).objs,[],1);
             Zmin       = min([Zmin;Offspring(all(Offspring.cons<=0,2)).objs],[],1);
-            Algorithm.moeas_pops{i} = NSGAIIIEnvironmentalSelection([Population,Offspring],Problem.N,Z,Zmin);
+            Population = NSGAIIIEnvironmentalSelection([Population,Offspring],Problem.N,Z,Zmin);
         end
     end
 end

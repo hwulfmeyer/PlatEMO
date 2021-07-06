@@ -21,8 +21,7 @@ classdef HH_MOEAD
             %% Parameter setting
             %type = Algorithm.ParameterSet(1);
             type = 1;
-
-            
+       
             %% Generate the weight vectors
             [W,Problem.N] = UniformPoint(Problem.N,Problem.M);
             T = ceil(Problem.N/10);
@@ -84,21 +83,30 @@ classdef HH_MOEAD
             end
         end
         
-        function update(~, Algorithm, Problem, k, Offsprings)
-            Population = Algorithm.moeas_pops{k};
+        function Population = update(~, Population, Problem, Offsprings)
+            type = 1;
+            
+            %% Generate the weight vectors
             [W,Problem.N] = UniformPoint(Problem.N,Problem.M);
+            T = ceil(Problem.N/10);
+
+            %% Detect the neighbours of each solution
+            B = pdist2(W,W);
+            [~,B] = sort(B,2);
+            B = B(:,1:T);
+            
+            Z = min(Population.objs,[],1);
+            
             for i = 1 : length(Offsprings)
                 % Choose the parents
                 % Generate an offspring
-                Offspring = Offsprings{i};
+                Offspring = Offsprings(i);
                 
-                % j is the neighborhood of i
-                j = pdist2(Offspring.obj, W, 'cosine'); %%TODO get maximum
-
+                % j is the neighborhood
+                [~,j] = max(1-pdist2(Offspring.objs,W,'cosine'),[],2);
                 P = B(j, randperm(size(B,2)));
           
                 % Update the ideal point
-                %% todo: class variable
                 Z = min(Z,Offspring.obj);
 
                 % Update the neighbours
