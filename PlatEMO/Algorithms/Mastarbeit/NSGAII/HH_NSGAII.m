@@ -2,13 +2,13 @@ classdef HH_NSGAII
     methods
         function main(~, Algorithm, Problem, maxFE, k)
             Population = Algorithm.moeas_pops{k};
-            [Population, FrontNo, CrowdDis] = NSGAIIEnvironmentalSelection(Population,Problem.N);
+            [Population, FrontNo, CrowdDis] = HH_NSGAIIEnvironmentalSelection(Population,Problem.N);
 
             %% Optimization
             while Algorithm.pro.FE < maxFE
                 MatingPool = TournamentSelection(2,Problem.N,FrontNo,-CrowdDis);
                 Offspring  = OperatorGA(Population(MatingPool));
-                [Population,FrontNo,CrowdDis] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
+                [Population,FrontNo,CrowdDis] = HH_NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
 
                 %% HH: update all Populations
                 Algorithm.moeas_pops{k} = Population;
@@ -17,7 +17,7 @@ classdef HH_NSGAII
         end
 
         function Population = update(~, Population, Problem, Offspring)
-            [Population,~,~] = NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
+            [Population,~,~] = HH_NSGAIIEnvironmentalSelection([Population,Offspring],Problem.N);
         end
     end
 end

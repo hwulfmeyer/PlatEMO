@@ -20,13 +20,13 @@ classdef HH_SPEA2
         function main(~, Algorithm, Problem, maxFE, k)
             %% Generate random population
             Population = Algorithm.moeas_pops{k};
-            Fitness    = CalFitness(Population.objs);
+            Fitness    = HH_SPEA2_CalFitness(Population.objs);
 
             %% Optimization
             while Algorithm.pro.FE < maxFE
                 MatingPool = TournamentSelection(2,Problem.N,Fitness);
                 Offspring  = OperatorGA(Population(MatingPool));
-                [Population,Fitness] = EnvironmentalSelection([Population,Offspring],Problem.N);
+                [Population,Fitness] = HH_SPEA2_EnvironmentalSelection([Population,Offspring],Problem.N);
             
                 %% HH: update all Populations
                 Algorithm.moeas_pops{k} = Population;
@@ -35,7 +35,7 @@ classdef HH_SPEA2
         end
         
         function Population = update(~, Population, Problem, Offspring)
-            [Population,~] = EnvironmentalSelection([Population,Offspring],Problem.N);
+            [Population,~] = HH_SPEA2_EnvironmentalSelection([Population,Offspring],Problem.N);
         end
     end
 end

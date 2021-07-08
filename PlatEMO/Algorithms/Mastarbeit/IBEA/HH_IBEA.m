@@ -1,11 +1,12 @@
-classdef HH_SPEA2SDE < ALGORITHM
-% <many> <real/binary/permutation>
-% SPEA2 with shift-based density estimation
+classdef HH_IBEA
+% <multi/many> <real/binary/permutation>
+% Indicator-based evolutionary algorithm
+% kappa --- 0.05 --- Fitness scaling factor
 
 %------------------------------- Reference --------------------------------
-% M. Li, S. Yang, and X. Liu, Shift-based density estimation for
-% Pareto-based algorithms in many-objective optimization, IEEE Transactions
-% on Evolutionary Computation, 2014, 18(3): 348-365.
+% E. Zitzler and S. Kunzli, Indicator-based selection in multiobjective
+% search, Proceedings of the International Conference on Parallel Problem
+% Solving from Nature, 2004, 832-842.
 %------------------------------- Copyright --------------------------------
 % Copyright (c) 2021 BIMK Group. You are free to use the PlatEMO for
 % research purposes. All publications which use this platform or any code
@@ -17,15 +18,17 @@ classdef HH_SPEA2SDE < ALGORITHM
 
     methods
         function main(~, Algorithm, Problem, maxFE, k)
+            %% Parameter setting
+            kappa = 0.05;
+
             %% Generate random population
             Population = Algorithm.moeas_pops{k};
-            Fitness    = HH_SPEA2SDE_CalFitness(Population.objs);
 
             %% Optimization
             while Algorithm.pro.FE < maxFE
-                MatingPool = TournamentSelection(2,Problem.N,Fitness);
+                MatingPool = TournamentSelection(2,Problem.N,-CalFitness(Population.objs,kappa));
                 Offspring  = OperatorGA(Population(MatingPool));
-                [Population,Fitness] = HH_SPEA2SDE_EnvironmentalSelection([Population,Offspring],Problem.N);
+                Population = HH_IBEA_EnvironmentalSelection([Population,Offspring],Problem.N,kappa);
             
                 %% HH: update all Populations
                 Algorithm.moeas_pops{k} = Population;
@@ -34,7 +37,8 @@ classdef HH_SPEA2SDE < ALGORITHM
         end
         
         function Population = update(~, Population, Problem, Offspring)
-            [Population,~] = HH_SPEA2SDE_EnvironmentalSelection([Population,Offspring],Problem.N);
+            kappa = 0.05;
+            Population = HH_IBEA_EnvironmentalSelection([Population,Offspring],Problem.N,kappa);
         end
     end
 end

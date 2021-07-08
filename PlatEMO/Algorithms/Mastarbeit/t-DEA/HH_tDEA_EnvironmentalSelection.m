@@ -1,4 +1,4 @@
-function [Population,z,znad] = EnvironmentalSelection(Population,W,N,z,znad)
+function [Population,z,znad] = HH_tDEA_EnvironmentalSelection(Population,W,N,z,znad)
 % The environmental selection of theta-DEA
 
 %------------------------------- Copyright --------------------------------

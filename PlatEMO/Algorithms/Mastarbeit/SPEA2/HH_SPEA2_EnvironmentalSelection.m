@@ -1,4 +1,4 @@
-function [Population,Fitness] = EnvironmentalSelection(Population,N)
+function [Population,Fitness] = HH_SPEA2_EnvironmentalSelection(Population,N)
 % The environmental selection of SPEA2
 
 %------------------------------- Copyright --------------------------------
@@ -11,7 +11,7 @@ function [Population,Fitness] = EnvironmentalSelection(Population,N)
 %--------------------------------------------------------------------------
 
     %% Calculate the fitness of each solution
-    Fitness = CalFitness(Population.objs);
+    Fitness = HH_SPEA2_CalFitness(Population.objs);
 
     %% Environmental selection
     Next = Fitness < 1;

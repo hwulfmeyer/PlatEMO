@@ -1,4 +1,4 @@
-function Population = NSGAIIIEnvironmentalSelection(Population,N,Z,Zmin)
+function Population = HH_NSGAIIIEnvironmentalSelection(Population,N,Z,Zmin)
 % The environmental selection of NSGA-III
 
 %------------------------------- Copyright --------------------------------

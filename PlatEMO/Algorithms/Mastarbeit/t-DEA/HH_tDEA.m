@@ -26,7 +26,7 @@ classdef HH_tDEA
             while Algorithm.pro.FE < maxFE
                 MatingPool = randi(Problem.N,1,Problem.N);
                 Offspring  = OperatorGA(Population(MatingPool));
-                [Population,z,znad] = EnvironmentalSelection([Population,Offspring],W,Problem.N,z,znad);
+                [Population,z,znad] = HH_tDEA_EnvironmentalSelection([Population,Offspring],W,Problem.N,z,znad);
                 
                 %% HH: update all Populations
                 Algorithm.moeas_pops{k} = Population;
@@ -37,7 +37,7 @@ classdef HH_tDEA
         function Population = update(~, Population, Problem, Offspring)
             [W,Problem.N] = UniformPoint(Problem.N,Problem.M);
             [z,znad]      = deal(min(Population.objs),max(Population.objs));
-            [Population,~,~] = EnvironmentalSelection([Population,Offspring],W,Problem.N,z,znad);
+            [Population,~,~] = HH_tDEA_EnvironmentalSelection([Population,Offspring],W,Problem.N,z,znad);
         end
     end
 end

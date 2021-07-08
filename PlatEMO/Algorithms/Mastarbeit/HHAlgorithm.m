@@ -14,7 +14,9 @@ classdef HHAlgorithm < ALGORITHM
 % platemo('algorithm',{@HHAlgorithm, [1,1,1,1]},'problem',@DTLZ2,'N',100,'maxFE',10000,'save',0);
 %
     properties(Constant)
-        moeas = {HH_NSGAIII, HH_NSGAII, HH_GLMO, HH_MOEAD, HH_MOEADD, HH_MOMBIII, HH_SPEA2, HH_SPEA2SDE, HH_tDEA}; %available MOEAs 
+        % #1 HH_GLMO, #2 HH_IBEA, #3 HH_MOEAD, #4 HH_MOEADD, #5 HH_MOMBIII,
+        % #6 HH_NSGAII, #7 HH_NSGAIII, #8 HH_SMPSO, #9 HH_SPEA2, #10 HH_SPEA2SDE, #11 HH_tDEA
+        moeas = {HH_GLMO, HH_IBEA, HH_MOEAD, HH_MOEADD, HH_MOMBIII, HH_NSGAII, HH_NSGAIII, HH_SMPSO, HH_SPEA2, HH_SPEA2SDE, HH_tDEA}; %available MOEAs 
     end
     properties
         moeas_pops;

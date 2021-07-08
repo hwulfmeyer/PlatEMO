@@ -1,4 +1,4 @@
-function Fitness = CalFitness(PopObj)
+function Fitness = HH_SPEA2_CalFitness(PopObj)
 % Calculate the fitness of each solution
 
 %------------------------------- Copyright --------------------------------
@@ -34,16 +34,9 @@ function Fitness = CalFitness(PopObj)
         R(i) = sum(S(Dominate(:,i)));
     end
     
-    %% Calculate the shifted distance between each two solutions
-    Distance = inf(N);
-    for i = 1 : N
-        SPopObj = max(PopObj,repmat(PopObj(i,:),N,1));
-        for j = [1:i-1,i+1:N]
-            Distance(i,j) = norm(PopObj(i,:)-SPopObj(j,:));
-        end
-    end
-    
     %% Calculate D(i)
+    Distance = pdist2(PopObj,PopObj);
+    Distance(logical(eye(length(Distance)))) = inf;
     Distance = sort(Distance,2);
     D = 1./(Distance(:,floor(sqrt(N)))+2);
     
