@@ -3,7 +3,7 @@ classdef HHAlgorithm < ALGORITHM
 % MOEA Hyper-Heuristic
 % encoding  --- [1,1,1,1] --- defines which algorithm to apply based on index of the MOEA in 'moeas'
 % hhRun --- 1 --- if the algorithm is run inside the HHProblem (1) or not (0)
-            
+
 %------------------------------- Copyright --------------------------------
 % Copyright (C) 2021 Hans-Martin Wulfmeyer
 %
@@ -32,11 +32,14 @@ classdef HHAlgorithm < ALGORITHM
             end
             
             %%max Function evaluations per Algorithm run
-            maxFEperAlgo = Algorithm.pro.maxFE/(length(encoding));
+            maxFEperAlgo = floor((Algorithm.pro.maxFE/Algorithm.pro.N)/length(encoding))*Algorithm.pro.N;
             for i = 1 : length(encoding)
                 moea_index = encoding(i);
-                Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFEperAlgo*i, moea_index);
-                
+                maxFE = maxFEperAlgo*i;
+                if i == length(encoding)
+                    maxFE = Algorithm.pro.maxFE;
+                end
+                Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFE, moea_index);
                 if hhRun == 1               
                     if Algorithm.pro.FE >= Algorithm.pro.maxFE
                         Algorithm.hhresult = Algorithm.moeas_pops{moea_index};

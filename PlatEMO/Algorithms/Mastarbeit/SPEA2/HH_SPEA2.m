@@ -35,7 +35,7 @@ classdef HH_SPEA2
         end
         
         function Population = update(~, Population, Problem, Offspring)
-            [Population,~,~] = EnvironmentalSelection([Population,Offspring],Problem.N);
+            [Population,~] = EnvironmentalSelection([Population,Offspring],Problem.N);
         end
     end
 end

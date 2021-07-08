@@ -3,6 +3,7 @@ classdef HHProblem < PROBLEM
 % subProblem	--- @DTLZ2 --- Pointer to the underlying Problem
 % subProbN      --- 100 --- population number of the underlying Problem
 % subProbMaxFE	--- 10000 --- maxFE for the underlying Problem
+% algorithmRuns	--- 3 --- number of runs per individual
 
 
 %------------------------------- Copyright --------------------------------
@@ -24,12 +25,13 @@ classdef HHProblem < PROBLEM
         subProblem; % Pointer to the underlying Problem
         subProbN; % population number of the underlying Problem
         subProbMaxFE; % maxFE for the underlying Problem
+        algorithmRuns; % number of runs per individual
         hhAlgorithm = @HHAlgorithm;
     end
     methods
         %% Default settings of the problem
         function Setting(obj)
-            [obj.subProblem, obj.subProbN, obj.subProbMaxFE] = obj.ParameterSet(@DTLZ2, 100, 10000);
+            [obj.subProblem, obj.subProbN, obj.subProbMaxFE, obj.algorithmRuns] = obj.ParameterSet(@DTLZ2, 100, 10000, 3);
             obj.M = 1;
             if isempty(obj.D); obj.D = 10; end % number of algorithms per run
             obj.lower    = 1;
@@ -45,12 +47,16 @@ classdef HHProblem < PROBLEM
             sProFE = obj.subProbMaxFE;
             sALG = obj.hhAlgorithm;
             PopObj = zeros(obj.N,obj.M);
-            for i = 1 : obj.N
-                algo = sALG('parameter', {PopDec(i,:)}, 'save', -1);
-                pro = sPRO('N', sProN, 'maxFE', sProFE);
-                algo.Solve(pro);
-                res = -HV(algo.hhresult, pro.optimum);
-                PopObj(i) = res;
+            parfor i = 1 : obj.N
+                results = zeros(obj.algorithmRuns,1);
+                for k = 1 : length(results)
+                    algo = sALG('parameter', {PopDec(i,:), 1}, 'save', -1);
+                    pro = sPRO('N', sProN, 'maxFE', sProFE);
+                    algo.Solve(pro);
+                    res = -HV(algo.hhresult, pro.optimum);
+                    results(k) = res;
+                end
+                PopObj(i) = median(results);
             end
             PROBLEM.Current(curProblem);
         end
