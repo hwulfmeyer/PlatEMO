@@ -48,15 +48,15 @@ classdef HHProblem < PROBLEM
             sALG = obj.hhAlgorithm;
             PopObj = zeros(obj.N,obj.M);
             parfor i = 1 : obj.N
-                results = zeros(obj.algorithmRuns,1);
-                for k = 1 : length(results)
+                runs = zeros(obj.algorithmRuns,1);
+                for k = 1 : length(runs)
                     algo = sALG('parameter', {PopDec(i,:), 1}, 'save', -1);
                     pro = sPRO('N', sProN, 'maxFE', sProFE);
                     algo.Solve(pro);
                     res = -HV(algo.hhresult, pro.optimum);
-                    results(k) = res;
+                    runs(k) = res;
                 end
-                PopObj(i) = median(results);
+                PopObj(i) = median(runs);
             end
             PROBLEM.Current(curProblem);
         end

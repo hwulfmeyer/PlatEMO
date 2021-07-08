@@ -1,9 +1,9 @@
 classdef HH_NSGAIII
     methods
-        function main(~, Algorithm, Problem, maxFE, i)
+        function main(~, Algorithm, Problem, maxFE, k)
             %% Generate the reference points and random population
             [Z,Problem.N] = UniformPoint(Problem.N,Problem.M);
-            Population    = Algorithm.moeas_pops{i};
+            Population    = Algorithm.moeas_pops{k};
             Zmin          = min(Population(all(Population.cons<=0,2)).objs,[],1);
 
             %% Optimization
@@ -14,8 +14,8 @@ classdef HH_NSGAIII
                 Population = NSGAIIIEnvironmentalSelection([Population,Offspring],Problem.N,Z,Zmin);
             
                 %%HH: update all Populations
-                Algorithm.moeas_pops{i} = Population;
-                Algorithm.update_populations(Problem, i, Offspring);
+                Algorithm.moeas_pops{k} = Population;
+                Algorithm.update_populations(Problem, k, Offspring);
             end
         end
 
