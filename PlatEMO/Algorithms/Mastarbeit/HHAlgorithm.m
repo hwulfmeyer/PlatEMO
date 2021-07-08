@@ -15,8 +15,8 @@ classdef HHAlgorithm < ALGORITHM
 %
     properties(Constant)
         % #1 HH_GLMO, #2 HH_IBEA, #3 HH_MOEAD, #4 HH_MOEADD, #5 HH_MOMBIII,
-        % #6 HH_NSGAII, #7 HH_NSGAIII, #8 HH_SMPSO, #9 HH_SPEA2, #10 HH_SPEA2SDE, #11 HH_tDEA
-        moeas = {HH_GLMO, HH_IBEA, HH_MOEAD, HH_MOEADD, HH_MOMBIII, HH_NSGAII, HH_NSGAIII, HH_SMPSO, HH_SPEA2, HH_SPEA2SDE, HH_tDEA}; %available MOEAs 
+        % #6 HH_NSGAII, #7 HH_NSGAIII, #8 HH_SPEA2, #9 HH_SPEA2SDE, #10 HH_tDEA
+        moeas = {HH_GLMO, HH_IBEA, HH_MOEAD, HH_MOEADD, HH_MOMBIII, HH_NSGAII, HH_NSGAIII, HH_SPEA2, HH_SPEA2SDE, HH_tDEA}; %available MOEAs 
     end
     properties
         moeas_pops;
@@ -26,13 +26,15 @@ classdef HHAlgorithm < ALGORITHM
         function main(Algorithm,Problem)
             %% Generate random population
             [encoding, hhRun] = Algorithm.ParameterSet([1,1,1,1], 1);
+            
+            %set Problem.N for all equal
+            [~,Problem.N] = UniformPoint(Problem.N,Problem.M);
             Population = Problem.Initialization();
             
             Algorithm.moeas_pops = cell(1,length(Algorithm.moeas));
             for k = 1 : length(Algorithm.moeas_pops)
                 Algorithm.moeas_pops{k} = Population;
             end
-            
             %%max Function evaluations per Algorithm run
             maxFEperAlgo = floor((Algorithm.pro.maxFE/Algorithm.pro.N)/length(encoding))*Algorithm.pro.N;
             for i = 1 : length(encoding)
