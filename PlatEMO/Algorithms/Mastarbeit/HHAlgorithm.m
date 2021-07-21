@@ -36,7 +36,7 @@ classdef HHAlgorithm < ALGORITHM
                 Algorithm.moeas_pops{k} = Population;
             end
             %%max Function evaluations per Algorithm run
-            maxFEperAlgo = floor((Algorithm.pro.maxFE/Algorithm.pro.N)/length(encoding))*Algorithm.pro.N;
+            maxFEperAlgo = floor((Algorithm.pro.maxFE/Problem.N)/length(encoding))*Problem.N;
             for i = 1 : length(encoding)
                 moea_index = encoding(i);
                 maxFE = maxFEperAlgo*i;

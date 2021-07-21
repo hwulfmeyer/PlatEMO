@@ -3,7 +3,7 @@ classdef HHProblem < PROBLEM
 % subProblem	--- @DTLZ2 --- Pointer to the underlying Problem
 % subProbN      --- 100 --- population number of the underlying Problem
 % subProbMaxFE	--- 10000 --- maxFE for the underlying Problem
-% algorithmRuns	--- 3 --- number of runs per individual
+% algorithmRuns	--- 7 --- number of runs per individual
 
 
 %------------------------------- Copyright --------------------------------
@@ -31,7 +31,7 @@ classdef HHProblem < PROBLEM
     methods
         %% Default settings of the problem
         function Setting(obj)
-            [obj.subProblem, obj.subProbN, obj.subProbMaxFE, obj.algorithmRuns] = obj.ParameterSet(@DTLZ2, 100, 10000, 3);
+            [obj.subProblem, obj.subProbN, obj.subProbMaxFE, obj.algorithmRuns] = obj.ParameterSet(@DTLZ2, 100, 10000, 7);
             obj.M = 1;
             if isempty(obj.D); obj.D = 10; end % number of algorithms per run
             obj.lower    = 1;
@@ -47,11 +47,11 @@ classdef HHProblem < PROBLEM
             sProFE = obj.subProbMaxFE;
             sALG = obj.hhAlgorithm;
             PopObj = zeros(obj.N,obj.M);
-            parfor i = 1 : obj.N
+            for i = 1 : obj.N
                 runs = zeros(obj.algorithmRuns,1);
-                for k = 1 : length(runs)
+                parfor k = 1 : length(runs)
                     algo = sALG('parameter', {PopDec(i,:), 1}, 'save', -1);
-                    pro = sPRO('N', sProN, 'maxFE', sProFE);
+                    pro = sPRO('N', sProN, 'maxFE', sProFE, 'D', 50);
                     algo.Solve(pro);
                     res = -HV(algo.hhresult, pro.optimum);
                     runs(k) = res;
