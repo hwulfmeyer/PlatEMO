@@ -3,6 +3,7 @@ classdef HHProblem < PROBLEM
 % subProblem	--- @DTLZ2 --- Pointer to the underlying Problem
 % subProbN      --- 100 --- population number of the underlying Problem
 % subProbMaxFE	--- 10000 --- maxFE for the underlying Problem
+% subProbD	--- 0 --- maxFE for the underlying Problem
 % algorithmRuns	--- 7 --- number of runs per individual
 
 
@@ -25,13 +26,14 @@ classdef HHProblem < PROBLEM
         subProblem; % Pointer to the underlying Problem
         subProbN; % population number of the underlying Problem
         subProbMaxFE; % maxFE for the underlying Problem
+        subProbD; % D for the underlying Problem
         algorithmRuns; % number of runs per individual
         hhAlgorithm = @HHAlgorithm;
     end
     methods
         %% Default settings of the problem
         function Setting(obj)
-            [obj.subProblem, obj.subProbN, obj.subProbMaxFE, obj.algorithmRuns] = obj.ParameterSet(@DTLZ2, 100, 10000, 7);
+            [obj.subProblem, obj.subProbN, obj.subProbMaxFE, obj.subProbD, obj.algorithmRuns] = obj.ParameterSet(@DTLZ2, 100, 10000, 0, 7);
             obj.M = 1;
             if isempty(obj.D); obj.D = 10; end % number of algorithms per run
             obj.lower    = 1;
@@ -45,15 +47,23 @@ classdef HHProblem < PROBLEM
             sPRO = obj.subProblem;
             sProN = obj.subProbN;
             sProFE = obj.subProbMaxFE;
+            sD = obj.subProbD;
             sALG = obj.hhAlgorithm;
             PopObj = zeros(obj.N,obj.M);
             for i = 1 : obj.N
                 runs = zeros(obj.algorithmRuns,1);
-                parfor k = 1 : length(runs)
+                for k = 1 : length(runs)
                     algo = sALG('parameter', {PopDec(i,:), 1}, 'save', -1);
-                    pro = sPRO('N', sProN, 'maxFE', sProFE, 'D', 50);
+                    if sD == 0
+                        pro = sPRO('N', sProN, 'maxFE', sProFE);
+                    else
+                        pro = sPRO('N', sProN, 'maxFE', sProFE, 'D', sD);
+                    end
                     algo.Solve(pro);
                     res = -HV(algo.hhresult, pro.optimum);
+                    if res == 0.0
+                        res = IHV(algo.hhresult, pro.optimum);
+                    end
                     runs(k) = res;
                 end
                 PopObj(i) = median(runs);

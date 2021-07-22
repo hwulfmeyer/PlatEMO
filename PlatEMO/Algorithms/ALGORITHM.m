@@ -35,6 +35,7 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
         pro;                            % problem solved in current execution
         result;                         % populations saved in current execution
         metric;                         % metric values of current populations
+        timerVal;                      % for time measurement
     end
     methods(Access = protected)
         function obj = ALGORITHM(varargin)
@@ -74,7 +75,7 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
                 obj.pro.FE = 0;
                 addpath(fileparts(which(class(obj))));
                 addpath(fileparts(which(class(obj.pro))));
-                tic;obj.main(PROBLEM.Current(obj.pro));
+                obj.timerVal = tic;obj.main(PROBLEM.Current(obj.pro));
             catch err
                 if ~strcmp(err.identifier,'PlatEMO:Termination')
                     rethrow(err);
@@ -107,13 +108,13 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
         %           ... ...
         %       end
         
-            obj.metric.runtime = obj.metric.runtime + toc;
+            obj.metric.runtime = obj.metric.runtime + toc(obj.timerVal);
             if obj.save <= 0; num = 10; else; num = obj.save; end
             index = max(1,min(min(num,size(obj.result,1)+1),ceil(num*obj.pro.FE/obj.pro.maxFE)));
             obj.result(index,:) = {obj.pro.FE,Population};
             drawnow(); obj.outputFcn(obj,obj.pro);
             nofinish = obj.pro.FE < obj.pro.maxFE;
-            assert(nofinish,'PlatEMO:Termination',''); tic;
+            assert(nofinish,'PlatEMO:Termination',''); obj.timerVal = tic;
         end
         function varargout = ParameterSet(obj,varargin)
         %ParameterSet - Obtain the parameters of the algorithm.
