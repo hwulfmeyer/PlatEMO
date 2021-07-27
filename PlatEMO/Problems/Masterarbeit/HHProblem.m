@@ -61,8 +61,9 @@ classdef HHProblem < PROBLEM
                     end
                     algo.Solve(pro);
                     res = -HV(algo.hhresult, pro.optimum);
-                    if res == 0.0
-                        res = IHV(algo.hhresult, pro.optimum);
+                    if res == 0
+                        RefPoint = zeros(1, pro.M);
+                        res = GD(algo.hhresult, RefPoint);
                     end
                     runs(k) = res;
                 end
