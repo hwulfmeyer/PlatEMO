@@ -1,6 +1,7 @@
 classdef EvalHHAlgorithm < ALGORITHM
-% <multi> <integer>
+% <multi/many> <real/binary/permutation>
 % Evaluation MOEA Hyper-Heuristic
+
 %------------------------------- Copyright --------------------------------
 % Copyright (C) 2021 Hans-Martin Wulfmeyer
 %
@@ -24,11 +25,20 @@ classdef EvalHHAlgorithm < ALGORITHM
             hhRun = 0;
             %% Generate random population
             probstr = class(Problem);
-            data = load("Data\results_exp1_" + probstr + "_.mat");
-            objectives = cell2mat(data.objRes);
-            medval = median(objectives);
-            medidx = find(objectives == medval, 1, 'first');
-            encoding = data.decRes{medidx};
+            data = load("Algorithms\HH_Evaluation\Data\results_exp1_" + probstr + "_.mat");
+            expRepitions = size(data.objRes,2);
+            decRes = cell(1,expRepitions);
+            objRes = cell(1,expRepitions);
+            for i = 1 : size(data.objRes,2)
+                minval = min(data.objRes{i});
+                minidx = find(data.objRes{i} == minval, 1, 'first');
+                objRes{1,i} = data.objRes{i}(minidx);
+                decRes{1,i} = data.decRes{i}(minidx,:);
+            end 
+            objRes = cell2mat(objRes);
+            medval = median(objRes);
+            medidx = find(objRes == medval, 1, 'first');
+            encoding = decRes{medidx};
 
             %set Problem.N for all equal
             [~,Problem.N] = UniformPoint(Problem.N,Problem.M);
