@@ -13,7 +13,7 @@ for probi = 1 : size(problems,2)
     
     timerVal = tic;
     for i = 1 : expRepitions
-        [Dec,Obj] = platemo('algorithm',@GA,'problem',{@HHProblem,prob,20,2000,probD,hhRepitions},'D',10,'N',100,'maxFE',10000,'save',1);
+        [Dec,Obj] = platemo('algorithm',@GA,'problem',{@HHProblem,prob,20,2000,probD,hhRepitions},'D',10,'N',20,'maxFE',2000,'save',1);
         objRes{1,i} = Obj;
         decRes{1,i} = Dec;
     end

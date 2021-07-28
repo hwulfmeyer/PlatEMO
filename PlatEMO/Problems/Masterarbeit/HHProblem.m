@@ -52,7 +52,7 @@ classdef HHProblem < PROBLEM
             PopObj = zeros(obj.N,obj.M);
             for i = 1 : obj.N
                 runs = zeros(obj.algorithmRuns,1);
-                parfor k = 1 : length(runs)
+                for k = 1 : length(runs)
                     algo = sALG('parameter', {PopDec(i,:), 1}, 'save', -1);
                     if sD == 0
                         pro = sPRO('N', sProN, 'maxFE', sProFE);
