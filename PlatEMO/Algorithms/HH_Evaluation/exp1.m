@@ -1,6 +1,7 @@
-problems = {{@DTLZ1,5},{@WFG1, 12}};   %, {@DTLZ2, 40}, {@DTLZ3, 5}, {@WFG1, 12}, {@WFG2, 12}, {@WFG3, 50}, {@WFG4, 50}};
+problems = {{@DTLZ1,5}};   %,{@WFG1, 12} {@DTLZ2, 40}, {@DTLZ3, 5}, {@WFG1, 12}, {@WFG2, 12}, {@WFG3, 50}, {@WFG4, 50}};
 expRepitions = 3;
 hhRepitions = 3;
+warning('off', 'all')
 for probi = 1 : size(problems,2)
     decRes = cell(1,expRepitions);
     objRes = cell(1,expRepitions);
@@ -11,8 +12,8 @@ for probi = 1 : size(problems,2)
     disp(probstr);
     
     timerVal = tic;
-    for i = 1 : expRepitions
-        [Dec,Obj] = platemo('algorithm',@GA,'problem',{@HHProblem,prob,20,20,2000,hhRepitions},'D',10,'N',100,'maxFE',1000,'save',1);
+    parfor i = 1 : expRepitions
+        [Dec,Obj] = platemo('algorithm',@GA,'problem',{@HHProblem,prob,20,20,2000,hhRepitions},'D',10,'N',100,'maxFE',10000,'save',1);
         objRes{1,i} = Obj;
         decRes{1,i} = Dec;
     end
