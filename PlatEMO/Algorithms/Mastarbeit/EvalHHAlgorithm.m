@@ -25,7 +25,7 @@ classdef EvalHHAlgorithm < ALGORITHM
             hhRun = 0;
             %% Generate random population
             probstr = class(Problem);
-            data = load("Algorithms\HH_Evaluation\Data\results_exp1_" + probstr + "_.mat");
+            data = load("Algorithms\HH_Evaluation\Data\results_exp2_" + probstr + "_.mat");
             expRepitions = size(data.objRes,2);
             decRes = cell(1,expRepitions);
             objRes = cell(1,expRepitions);
@@ -39,7 +39,7 @@ classdef EvalHHAlgorithm < ALGORITHM
             medval = median(objRes);
             medidx = find(objRes == medval, 1, 'first');
             encoding = decRes{medidx};
-
+            disp(encoding)
             %set Problem.N for all equal
             [~,Problem.N] = UniformPoint(Problem.N,Problem.M);
             Population = Problem.Initialization();
