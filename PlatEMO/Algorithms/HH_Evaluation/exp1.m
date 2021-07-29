@@ -13,11 +13,11 @@ for probi = 1 : size(problems,2)
     
     timerVal = tic;
     for i = 1 : expRepitions
-        [Dec,Obj] = platemo('algorithm',@GA,'problem',{@HHProblem,prob,20,2000,probD,hhRepitions},'D',10,'N',20,'maxFE',2000,'save',1);
+        [Dec,Obj] = platemo('algorithm',@GA,'problem',{@HHProblem,prob,20,2000,probD,hhRepitions},'D',4,'N',20,'maxFE',2000,'save',1);
         objRes{1,i} = Obj;
         decRes{1,i} = Dec;
     end
     timeToFinish = toc(timerVal);
 
-    save("Algorithms\HH_Evaluation\Data\results_exp1_" + probstr + "_.mat", 'decRes', 'objRes', 'timeToFinish', '-mat');
+    save("Algorithms\HH_Evaluation\Data\results_exp2_" + probstr + "_.mat", 'decRes', 'objRes', 'timeToFinish', '-mat');
 end
