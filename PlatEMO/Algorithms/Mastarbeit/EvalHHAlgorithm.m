@@ -19,13 +19,15 @@ classdef EvalHHAlgorithm < ALGORITHM
     properties
         moeas_pops;
         hhresult;
+        encoding;
+        algorithmsUsed;   
     end
     methods
         function main(Algorithm,Problem)
             hhRun = 0;
-            %% Generate random population
+            %% get encoding
             probstr = class(Problem);
-            data = load("Algorithms\HH_Evaluation\Data\results_exp2_" + probstr + "_.mat");
+            data = load("Algorithms\HH_Evaluation\Data\results_exp3_" + probstr + "_.mat");
             expRepitions = size(data.objRes,2);
             decRes = cell(1,expRepitions);
             objRes = cell(1,expRepitions);
@@ -38,26 +40,28 @@ classdef EvalHHAlgorithm < ALGORITHM
             objRes = cell2mat(objRes);
             medval = median(objRes);
             medidx = find(objRes == medval, 1, 'first');
-            encoding = decRes{medidx};
-            disp(encoding)
+            Algorithm.encoding = decRes{medidx};
+            Algorithm.algorithmsUsed = unique(Algorithm.encoding);
+            
             %set Problem.N for all equal
             [~,Problem.N] = UniformPoint(Problem.N,Problem.M);
-            Population = Problem.Initialization();
-            
-            Algorithm.moeas_pops = cell(1,length(Algorithm.moeas));
-            for k = 1 : length(Algorithm.moeas_pops)
-                Algorithm.moeas_pops{k} = Population;
+            Algorithm.moeas_pops = cell(1,length(Algorithm.encoding));
+            for k = 1 : length(Algorithm.encoding)
+                Algorithm.moeas_pops{k} = Problem.Initialization();
             end
             %%max Function evaluations per Algorithm run
-            maxFEperAlgo = floor((Algorithm.pro.maxFE/Problem.N)/length(encoding))*Problem.N;
-            for i = 1 : length(encoding)
-                moea_index = encoding(i);
+            maxFEperAlgo = floor((Algorithm.pro.maxFE/Problem.N)/length(Algorithm.encoding))*Problem.N;
+            
+            for i = 1 : length(Algorithm.encoding)
+                moea_index = Algorithm.encoding(i);
                 maxFE = maxFEperAlgo*i;
-                if i == length(encoding)
+                if i == length(Algorithm.encoding)
                     maxFE = Algorithm.pro.maxFE;
                 end
                 Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFE, moea_index);
-                if hhRun == 1               
+                Population = Algorithm.moeas_pops{moea_index};
+                %Algorithm.update_populations2(Problem, moea_index, Population);
+                if hhRun == 1
                     if Algorithm.pro.FE >= Algorithm.pro.maxFE
                         Algorithm.hhresult = Algorithm.moeas_pops{moea_index};
                         return
@@ -70,12 +74,24 @@ classdef EvalHHAlgorithm < ALGORITHM
             end
         end
         
-        function update_populations(Algorithm, Problem, i, Offspring)
-           for k = 1 : length(Algorithm.moeas)
-                if i == k
+        function update_populations(Algorithm, Problem, i, Offspring)       
+           for k = 1 : length(Algorithm.algorithmsUsed)
+               updateAlgo = Algorithm.algorithmsUsed(k);
+                if i == updateAlgo
                     continue
                 end
-                Algorithm.moeas_pops{k} = Algorithm.moeas{k}.update(Algorithm.moeas_pops{k}, Problem, Offspring);
+                Algorithm.moeas_pops{updateAlgo} = Algorithm.moeas{updateAlgo}.update(Algorithm.moeas_pops{updateAlgo}, Problem, Offspring);
+           end
+        end
+        
+        function update_populations2(Algorithm, Problem, i, Offspring)
+           %for updating once after ever algorithm, currently not used
+           for k = 1 : length(Algorithm.algorithmsUsed)
+               updateAlgo = Algorithm.algorithmsUsed(k);
+                if i == updateAlgo
+                    continue
+                end
+                Algorithm.moeas_pops{updateAlgo} = Algorithm.moeas{updateAlgo}.update(Algorithm.moeas_pops{updateAlgo}, Problem, Offspring);
            end
         end
     end

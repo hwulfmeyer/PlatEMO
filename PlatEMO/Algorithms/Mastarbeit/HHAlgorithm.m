@@ -46,8 +46,8 @@ classdef HHAlgorithm < ALGORITHM
                     maxFE = Algorithm.pro.maxFE;
                 end
                 Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFE, moea_index);
-                Population = Algorithm.moeas_pops{moea_index};
-                Algorithm.update_populations2(Problem, moea_index, Population);
+                %Population = Algorithm.moeas_pops{moea_index};
+                %Algorithm.update_populations2(Problem, moea_index, Population);
                 if hhRun == 1
                     if Algorithm.pro.FE >= Algorithm.pro.maxFE
                         Algorithm.hhresult = Algorithm.moeas_pops{moea_index};
@@ -61,19 +61,18 @@ classdef HHAlgorithm < ALGORITHM
             end
         end
         
-        function update_populations(Algorithm, Problem, i, Offspring)
-           %{
+        function update_populations(Algorithm, Problem, i, Offspring)       
            for k = 1 : length(Algorithm.algorithmsUsed)
                updateAlgo = Algorithm.algorithmsUsed(k);
                 if i == updateAlgo
                     continue
                 end
                 Algorithm.moeas_pops{updateAlgo} = Algorithm.moeas{updateAlgo}.update(Algorithm.moeas_pops{updateAlgo}, Problem, Offspring);
-            end
-            %}
+           end
         end
         
         function update_populations2(Algorithm, Problem, i, Offspring)
+           %for updating once after ever algorithm, currently not used
            for k = 1 : length(Algorithm.algorithmsUsed)
                updateAlgo = Algorithm.algorithmsUsed(k);
                 if i == updateAlgo
