@@ -32,9 +32,10 @@ classdef HHAlgorithm < ALGORITHM
             
             %set Problem.N for all equal
             [~,Problem.N] = UniformPoint(Problem.N,Problem.M);
-            Algorithm.moeas_pops = cell(1,length(Algorithm.encoding));
-            for k = 1 : length(Algorithm.encoding)
-                Algorithm.moeas_pops{k} = Problem.Initialization();
+            Algorithm.moeas_pops = cell(1,length(Algorithm.moeas));
+            for k = 1 : length(Algorithm.algorithmsUsed)
+                moea_index = Algorithm.algorithmsUsed(k);
+                Algorithm.moeas_pops{moea_index} = Problem.Initialization();
             end
             %%max Function evaluations per Algorithm run
             maxFEperAlgo = floor((Algorithm.pro.maxFE/Problem.N)/length(Algorithm.encoding))*Problem.N;

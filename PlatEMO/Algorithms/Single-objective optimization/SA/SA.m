@@ -1,4 +1,4 @@
-classdef HHSA < ALGORITHM
+classdef SA < ALGORITHM
 % <single> <real> <large/none> <constrained/none>
 % Simulated annealing
 
