@@ -1,4 +1,4 @@
-classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
+ classdef ALGORITHM_hans < handle & matlab.mixin.Heterogeneous
 %ALGORITHM - The superclass of algorithms.
 %
 %   This is the superclass of algorithms. An object of ALGORITHM stores the
@@ -35,9 +35,7 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
         pro;                            % problem solved in current execution
         result;                         % populations saved in current execution
         metric;                         % metric values of current populations
-        timerVal;                       % for time measurement
-        runNo;
-        extraStr;
+        timerVal;                      % for time measurement
     end
     methods(Access = protected)
         function obj = ALGORITHM(varargin)
@@ -52,7 +50,7 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
         %        Algorithm = MOEAD('parameter',4,'save',1)
 
             isStr = find(cellfun(@ischar,varargin(1:end-1))&~cellfun(@isempty,varargin(2:end)));
-            for i = isStr(ismember(varargin(isStr),{'parameter','save','outputFcn','runNo','extraStr'}))
+            for i = isStr(ismember(varargin(isStr),{'parameter','save','outputFcn'}))
                 obj.(varargin{i}) = varargin{i+1};
             end
         end
@@ -140,12 +138,11 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
         function Output(Algorithm,Problem)
         % The default output function of ALGORITHM.
             %% commented out by me!
-            %clc;
+            %clc; 
             fprintf('%s on %d-objective %d-variable %s (%6.2f%%), %.2fs passed...\n',class(Algorithm),Problem.M,Problem.D,class(Problem),Problem.FE/Problem.maxFE*100,Algorithm.metric.runtime);
             %%
             if Problem.FE >= Problem.maxFE
                 if Algorithm.save == 0
-                    disp("kleiner");
                     if Problem.M > 1
                         Population = Algorithm.result{end};
                         if length(Population) >= size(Problem.optimum,1); name = 'HV'; else; name = 'IGD'; end
@@ -173,13 +170,10 @@ classdef ALGORITHM < handle & matlab.mixin.Heterogeneous
                 elseif Algorithm.save > 0
                     folder = fullfile('Data',class(Algorithm));
                     [~,~]  = mkdir(folder);
-                    disp(Algorithm.runNo);
-                    disp(Algorithm.extraStr);
-                    file   = fullfile(folder,sprintf('%s_%s_%s_R%d',class(Algorithm),class(Problem),Algorithm.extraStr,Algorithm.runNo));
+                    file   = fullfile(folder,sprintf('%s_%s_M%d_D%d_',class(Algorithm),class(Problem),Problem.M,Problem.D));
                     result = Algorithm.result;
                     metric = Algorithm.metric;
-                    disp(file);
-                    save([file,'.mat'],'result','metric');
+                    save([file,num2str(runNo),'.mat'],'result','metric');
                 end
             end
         end
