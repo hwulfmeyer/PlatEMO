@@ -83,8 +83,8 @@ function returnValue = executeWorkpackage(package)
     probD = package{2};
     i_exp = package{3};
     hhRepitions = 3;
-    %platemo('algorithm',@GA,'problem',{@HHProblem,subProb,40,4000,probD,hhRepitions},'D',10,'N',100,'maxFE',10000,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
-    platemo('algorithm',@GA,'problem',{@HHProblem,subProb,20,20,probD,hhRepitions},'D',2,'N',2,'maxFE',2,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
+    platemo('algorithm',@GA,'problem',{@HHProblem,subProb,40,4000,probD,hhRepitions},'D',10,'N',100,'maxFE',10000,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
+    %platemo('algorithm',@GA,'problem',{@HHProblem,subProb,20,20,probD,hhRepitions},'D',2,'N',2,'maxFE',2,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
     
     returnValue = strcat("Successfully ran ", func2str(subProb), " with runNo ", num2str(i_exp));
 
