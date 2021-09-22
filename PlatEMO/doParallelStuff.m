@@ -1,5 +1,8 @@
+poolobj = gcp('nocreate');
+delete(poolobj);
+
 n = feature('numcores');
-%thePool = parpool(n);
+thePool = parpool(n);
 cd(fileparts(mfilename('fullpath')));
 addpath(genpath(cd));
 
@@ -21,18 +24,23 @@ for i = 1:numPackages
     file  = fullfile(folder,sprintf('%s_%s_%s_R%d',class(Algorithm),class(HHProblem),func2str(subProb),i_exp));
     file = [file,'.mat'];
     if isfile(file)
-        disp(strcat("skip experiment: ", file));
-        continue
+        runFile = load(file);
+        % number of saved populations should be 10
+        % otherwise it did not finish
+        if length(runFile.result) == 10
+            disp(strcat("SKIP experiment: ", file));
+            continue
+        end
     end
-    f(packagesInQueue+1) = parfeval(@executeWorkpackage, 1, pack);
+    f(packagesInQueue+1) = parfeval(thePool, @executeWorkpackage, 1, pack);
     packagesInQueue = packagesInQueue + 1;
 end
 
 for i = 1:packagesInQueue
     % fetchNext blocks until next results are available.
+    disp(strcat("Queued Tasks: ", num2str(length(thePool.FevalQueue.QueuedFutures))));
     [completedIdx,value] = fetchNext(f);
-    aString = strcat("For i = ", num2str(i), " : ", value);
-    disp(aString);
+    disp(strcat("For i = ", num2str(i), " : ", value));
 end
 
 toc(tStart)
@@ -75,8 +83,8 @@ function returnValue = executeWorkpackage(package)
     probD = package{2};
     i_exp = package{3};
     hhRepitions = 3;
-    platemo('algorithm',@GA,'problem',{@HHProblem,subProb,40,4000,probD,hhRepitions},'D',10,'N',100,'maxFE',10000,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
-    %platemo('algorithm',@GA,'problem',{@HHProblem,subProb,20,20,probD,hhRepitions},'D',2,'N',2,'maxFE',20,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
+    %platemo('algorithm',@GA,'problem',{@HHProblem,subProb,40,4000,probD,hhRepitions},'D',10,'N',100,'maxFE',10000,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
+    platemo('algorithm',@GA,'problem',{@HHProblem,subProb,20,20,probD,hhRepitions},'D',2,'N',2,'maxFE',2,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
     
     returnValue = strcat("Successfully ran ", func2str(subProb), " with runNo ", num2str(i_exp));
 
