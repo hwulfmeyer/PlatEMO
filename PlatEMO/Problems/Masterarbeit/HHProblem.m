@@ -50,15 +50,19 @@ classdef HHProblem < PROBLEM
             sD = obj.subProbD;
             sALG = obj.hhAlgorithm;
             PopObj = zeros(obj.N,obj.M);
-            for i = 1 : obj.N
-                runs = zeros(obj.algorithmRuns,1);
-                for k = 1 : length(runs)
+            subProblems = cell(1,obj.algorithmRuns);
+            for k = 1 : length(subProblems)
+                if sD == 0
+                    subProblems{k} = sPRO('N', sProN, 'maxFE', sProFE);
+                else
+                    subProblems{k} = sPRO('N', sProN, 'maxFE', sProFE, 'D', sD);
+                end
+            end
+            for i = 1 : obj.N % => 10
+                runs = zeros(length(subProblems),1);
+                for k = 1 : length(subProblems) % => 3
                     algo = sALG('parameter', {PopDec(i,:), 1}, 'save', -1);
-                    if sD == 0
-                        pro = sPRO('N', sProN, 'maxFE', sProFE);
-                    else
-                        pro = sPRO('N', sProN, 'maxFE', sProFE, 'D', sD);
-                    end
+                    pro = subProblems{k};
                     algo.Solve(pro);
                     res = -HV(algo.hhresult, pro.optimum);
                     if res == 0
