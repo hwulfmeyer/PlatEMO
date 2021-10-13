@@ -1,0 +1,1 @@
+platemo('algorithm',@GA,'problem',@WFG5,'D',2,'N',10,'maxFE',30,'save',10,'runNo',1,'extraStr',"WFG2");
