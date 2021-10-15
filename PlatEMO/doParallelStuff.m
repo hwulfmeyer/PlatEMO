@@ -47,7 +47,7 @@ toc(tStart)
 disp("Ende")
 
 function packageList = createWorkpackages()
-    problems = {{@WFG3, 50}, {@WFG4, 50}, {@WFG5, 12}, {@WFG6, 12}, {@DTLZ1,5}, {@DTLZ2, 40}, {@DTLZ3, 5}}; %
+    problems = {{@WFG3, 50}, {@WFG4, 50}, {@WFG5, 12}, {@WFG6, 12}, {@ZDT1,30},{@ZDT2,30},{@ZDT3,30}}; %  {@DTLZ1,5}, {@DTLZ2, 40}, {@DTLZ3, 5}
     expRepitions = 21;
     
     packageList = cell(1,size(problems,2)*expRepitions);
@@ -84,7 +84,7 @@ function returnValue = executeWorkpackage(package)
     i_exp = package{3};
     hhRepitions = 3;
     platemo('algorithm',@GA,'problem',{@HHProblem,subProb,40,4000,probD,hhRepitions},'D',10,'N',100,'maxFE',10000,'save',10,'runNo',i_exp,'extraStr',func2str(subProb));
-    %platemo('algorithm',@GA,'problem',{@HHProblem,subProb,20,60,probD,hhRepitions},'D',2,'N',2,'maxFE',6,'save',3,'runNo',i_exp,'extraStr',func2str(subProb));
+    %platemo('algorithm',@GA,'problem',{@HHProblem,subProb,20,60,probD,hhRepitions},'D',2,'N',10,'maxFE',6,'save',3,'runNo',i_exp,'extraStr',func2str(subProb));
     
     returnValue = strcat("Successfully ran ", func2str(subProb), " with runNo ", num2str(i_exp));
 
