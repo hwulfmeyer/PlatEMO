@@ -27,24 +27,12 @@ classdef EvalHHAlgorithm < ALGORITHM
             hhRun = 0;
             %% get encoding
             probstr = class(Problem);
-            data = load("Algorithms\HH_Evaluation\Data\results_exp3_" + probstr + "_.mat");
-            expRepitions = size(data.objRes,2);
-            decRes = cell(1,expRepitions);
-            objRes = cell(1,expRepitions);
-            for i = 1 : size(data.objRes,2)
-                minval = min(data.objRes{i});
-                minidx = find(data.objRes{i} == minval, 1, 'first');
-                objRes{1,i} = data.objRes{i}(minidx);
-                decRes{1,i} = data.decRes{i}(minidx,:);
-            end 
-            objRes = cell2mat(objRes);
-            medval = median(objRes);
-            medidx = find(objRes == medval, 1, 'first');
-            Algorithm.encoding = decRes{medidx};
+            Algorithm.encoding = Algorithm.GetEncoding(probstr);
             Algorithm.algorithmsUsed = unique(Algorithm.encoding);
             
             %set Problem.N for all equal
             [~,Problem.N] = UniformPoint(Problem.N,Problem.M);
+            disp(Problem.N);
             Algorithm.moeas_pops = cell(1,length(Algorithm.encoding));
             for k = 1 : length(Algorithm.encoding)
                 Algorithm.moeas_pops{k} = Problem.Initialization();
@@ -59,7 +47,7 @@ classdef EvalHHAlgorithm < ALGORITHM
                     maxFE = Algorithm.pro.maxFE;
                 end
                 Algorithm.moeas{moea_index}.main(Algorithm, Problem, maxFE, moea_index);
-                Population = Algorithm.moeas_pops{moea_index};
+                %Population = Algorithm.moeas_pops{moea_index};
                 %Algorithm.update_populations2(Problem, moea_index, Population);
                 if hhRun == 1
                     if Algorithm.pro.FE >= Algorithm.pro.maxFE
@@ -93,6 +81,36 @@ classdef EvalHHAlgorithm < ALGORITHM
                 end
                 Algorithm.moeas_pops{updateAlgo} = Algorithm.moeas{updateAlgo}.update(Algorithm.moeas_pops{updateAlgo}, Problem, Offspring);
            end
+        end
+        
+        function meddec = GetEncoding(~, probstr)
+            folderpath = "MAStuff\HH_Evaluation\Data\12.10.2021\GA\";
+            fstruct = dir(folderpath + "GA_HHProblem_" + probstr + "_R*.mat");
+            expRepitions = length(fstruct);
+            decRes = cell(expRepitions,1);
+            objRes = cell(expRepitions,1);
+            for i = 1 : expRepitions
+                data = load(folderpath + fstruct(i).name);
+                result = data.result;
+                minObj = realmax;
+                minIdx = 0;
+                for idx = 1:length(result{length(result),2})
+                    solution = result{length(result),2}(idx);
+                    if solution.obj < minObj
+                        minObj = solution.obj;
+                        minIdx = idx;
+                    end
+                end
+                if minIdx ~= 1
+                    disp(minIdx)
+                end
+                decRes{i} = result{length(result),2}(minIdx).dec;
+                objRes{i} = result{length(result),2}(minIdx).obj;
+            end
+            objRes = cell2mat(objRes);
+            medval = median(objRes);
+            medidx = find(objRes == medval, 1, 'first');
+            meddec = decRes{medidx};
         end
     end
 end

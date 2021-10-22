@@ -26,7 +26,7 @@ classdef HH_IBEA
 
             %% Optimization
             while Algorithm.pro.FE < maxFE
-                MatingPool = TournamentSelection(2,Problem.N,-CalFitness(Population.objs,kappa));
+                MatingPool = TournamentSelection(2,Problem.N,-HH_IBEA_CalFitness(Population.objs,kappa));
                 Offspring  = OperatorGA(Population(MatingPool));
                 Population = HH_IBEA_EnvironmentalSelection([Population,Offspring],Problem.N,kappa);
             
