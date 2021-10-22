@@ -3,7 +3,7 @@ classdef HHProblem < PROBLEM
 % subProblem	--- @DTLZ2 --- Pointer to the underlying Problem
 % subProbN      --- 100 --- population number of the underlying Problem
 % subProbMaxFE	--- 10000 --- maxFE for the underlying Problem
-% subProbD	--- 0 --- maxFE for the underlying Problem
+% subProbD	--- 0 --- number of decision variables for the underlying Problem
 % algorithmRuns	--- 7 --- number of runs per individual
 
 
