@@ -47,7 +47,7 @@ toc(tStart)
 disp("Ende")
 
 function packageList = createWorkpackages()
-    problems = {{@WFG3, 50}, {@WFG4, 50}, {@WFG5, 12}, {@WFG6, 12}, {@ZDT1,30},{@ZDT2,30},{@ZDT3,30}}; %  {@DTLZ1,5}, {@DTLZ2, 40}, {@DTLZ3, 5}
+    problems = {{@DTLZ2, 40},{@WFG3, 50}, {@WFG4, 50}, {@WFG5, 12}, {@WFG6, 12}, {@ZDT1,30},{@ZDT2,30},{@ZDT3,30}}; %  {@DTLZ1,5}, {@DTLZ2, 40}, {@DTLZ3, 5}
     expRepitions = 21;
     
     packageList = cell(1,size(problems,2)*expRepitions);
