@@ -1,5 +1,5 @@
-folderpath = "D:\git-repos\PlatEMO\PlatEMO\Data\GA\";
-problems = {{@WFG1, 40}, {@WFG2, 50}, {@WFG5, 50},{@WFG6, 50}};
+folderpath = "D:\git-repos\PlatEMO\PlatEMO\MAStuff\HH_Evaluation\Data\26.10.2021\GA\";
+problems = {{@WFG4,1}};
 for probi = 1 : size(problems,2)
     probstr = func2str(problems{probi}{1});
     fstruct = dir(folderpath + "GA_HHProblem_" + probstr + "_R*.mat");
