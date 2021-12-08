@@ -84,7 +84,7 @@ classdef EvalHHAlgorithm < ALGORITHM
         end
         
         function meddec = GetEncoding(~, probstr)
-            folderpath = "MAStuff\HH_Evaluation\Data\12.10.2021\GA\";
+            folderpath = "D:\git-repos\PlatEMO\PlatEMO\MAStuff\HH_Evaluation\Data\Data\GA\";
             fstruct = dir(folderpath + "GA_HHProblem_" + probstr + "_R*.mat");
             expRepitions = length(fstruct);
             decRes = cell(expRepitions,1);
@@ -108,7 +108,7 @@ classdef EvalHHAlgorithm < ALGORITHM
                 objRes{i} = result{length(result),2}(minIdx).obj;
             end
             objRes = cell2mat(objRes);
-            medval = median(objRes);
+            medval = min(objRes);
             medidx = find(objRes == medval, 1, 'first');
             meddec = decRes{medidx};
         end
