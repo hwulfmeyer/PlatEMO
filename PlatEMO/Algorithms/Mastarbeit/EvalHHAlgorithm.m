@@ -108,7 +108,7 @@ classdef EvalHHAlgorithm < ALGORITHM
                 objRes{i} = result{length(result),2}(minIdx).obj;
             end
             objRes = cell2mat(objRes);
-            medval = min(objRes);
+            medval = median(objRes);
             medidx = find(objRes == medval, 1, 'first');
             meddec = decRes{medidx};
         end
