@@ -32,13 +32,21 @@ for i = 1:numPackages
             continue
         end
     end
+    disp(strcat("MAKE experiment: ", file));
     f(packagesInQueue+1) = parfeval(thePool, @executeWorkpackage, 1, pack);
     packagesInQueue = packagesInQueue + 1;
 end
 
+disp("Packages in Queue: " + num2str(packagesInQueue));
+
 for i = 1:packagesInQueue
     % fetchNext blocks until next results are available.
     disp(strcat("Queued Tasks: ", num2str(length(thePool.FevalQueue.QueuedFutures))));
+    for i = 1:length(f)
+        if strcmp(f(i).State, 'running')
+            disp(strcat(func2str(f(i).InputArguments{1}{1}), " => ", datestr(f(i).StartDateTime )));
+        end
+    end
     [completedIdx,value] = fetchNext(f);
     disp(strcat("For i = ", num2str(i), " : ", value));
 end
@@ -47,7 +55,7 @@ toc(tStart)
 disp("Ende")
 
 function packageList = createWorkpackages()
-    problems = {{@DTLZ1,5}, {@DTLZ2, 40}, {@DTLZ3, 5},{@WFG3, 50}, {@WFG4, 50}, {@WFG5, 12}, {@WFG6, 12}, {@ZDT1,30},{@ZDT2,30}}; %
+    problems = {{@DTLZ1,5}, {@DTLZ2, 40}, {@DTLZ3, 5},{@WFG3, 50}, {@WFG4, 50}, {@WFG5, 12}, {@WFG6, 12},{@ZDT1,30},{@ZDT2,30}}; %
     expRepitions = 21;
     
     packageList = cell(1,size(problems,2)*expRepitions);
