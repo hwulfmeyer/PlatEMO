@@ -16,7 +16,7 @@ classdef HHAlgorithm < ALGORITHM
     properties(Constant)
         % #1 HH_GLMO, #2 HH_IBEA, #3 HH_MOEAD, #4 HH_MOEADD, #5 HH_MOMBIII,
         % #6 HH_NSGAII, #7 HH_NSGAIII, #8 HH_SPEA2, #9 HH_SPEA2SDE, #10 HH_tDEA
-        moeas = {HH_GLMO, HH_IBEA, HH_MOEAD, HH_MOEADD, HH_MOMBIII, HH_NSGAII, HH_NSGAIII, HH_SPEA2, HH_SPEA2SDE, HH_tDEA}; %available MOEAs 
+        moeas = {HH_GLMO, HH_IBEA, HH_MOMBIII, HH_SPEA2SDE}; %, HH_tDEA, available MOEAs HH_MOEAD, HH_MOEADD, HH_NSGAII, HH_NSGAIII, HH_SPEA2, 
     end
     properties
         moeas_pops;
