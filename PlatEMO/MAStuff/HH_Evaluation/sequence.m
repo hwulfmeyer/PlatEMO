@@ -1,5 +1,5 @@
 folderpath = "D:\git-repos\PlatEMO\PlatEMO\MAStuff\HH_Evaluation\Data\Data\GA\";
-problems = {{@DTLZ1,1}};
+problems = {{@DTLZ1,5},{@DTLZ2, 40}, {@DTLZ3, 5},{@WFG3, 50}, {@WFG4, 50}, {@WFG5, 12}, {@WFG6, 12},{@ZDT1,30},{@ZDT2,30}}; 
 for probi = 1 : size(problems,2)
     probstr = func2str(problems{probi}{1});
     fstruct = dir(folderpath + "GA_HHProblem_" + probstr + "_R*.mat");
@@ -28,9 +28,10 @@ for probi = 1 : size(problems,2)
     objRes = cell2mat(objRes);
     medval = median(objRes);
     medidx = find(objRes == medval, 1, 'first');
-    decRes
-    objRes
-    medval
-    medidx
-    meddec = decRes{medidx}
+    %decRes
+    %objRes
+    %medval
+    %medidx
+    meddec = decRes{medidx};
+    disp(meddec);
 end
