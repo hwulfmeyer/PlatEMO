@@ -1,4 +1,4 @@
-folderpath = "D:\git-repos\PlatEMO\PlatEMO\MAStuff\HH_Evaluation\Data\Data\GA\";
+folderpath = "D:\git-repos\PlatEMO\PlatEMO\MAStuff\HH_Evaluation\Data_Reduced\Data\GA\";
 problems = {{@DTLZ1,1},{@DTLZ2,1},{@DTLZ3,1},{@WFG3,1},{@WFG4,1},{@WFG5,1},{@WFG6,1},{@ZDT1,1},{@ZDT2,1}};
 for probi = 1 : size(problems,2)
     probstr = func2str(problems{probi}{1});
