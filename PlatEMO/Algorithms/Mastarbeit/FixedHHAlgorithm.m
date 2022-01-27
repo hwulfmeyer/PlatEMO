@@ -30,7 +30,7 @@ classdef FixedHHAlgorithm < ALGORITHM
             
             
             if Problem.D < 40
-                Algorithm.encoding = [1,2,5,5,5,5,9,9,9,9];
+                Algorithm.encoding = [1,5,5,5,5,5,9,9,9,9];
             else
                 Algorithm.encoding = [1,1,1,1,1,1,1,2,2,2];
             end
